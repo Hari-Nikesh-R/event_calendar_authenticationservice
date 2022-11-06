@@ -1,6 +1,9 @@
 package com.example.authenticationService.model;
 
 
+import lombok.Data;
+
+@Data
 public class AuthDto {
     private String userName;
     private String password;
