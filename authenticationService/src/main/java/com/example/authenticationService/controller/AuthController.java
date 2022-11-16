@@ -27,7 +27,7 @@ public class AuthController {
 
     @Autowired
     private JwtUserDetailsService userDetailsService;
-    @RequestMapping(value = "/  login",method = RequestMethod.GET)
+    @RequestMapping(value = "/login",method = RequestMethod.GET)
     public String loginUser()
     {
         return "Came inside Login";
