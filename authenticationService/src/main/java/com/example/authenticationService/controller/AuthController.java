@@ -27,10 +27,10 @@ public class AuthController {
 
     @Autowired
     private JwtUserDetailsService userDetailsService;
-    @PostMapping
-    public void loginUser(AuthDto authDto)
+    @RequestMapping(value = "/  login",method = RequestMethod.GET)
+    public String loginUser()
     {
-
+        return "Came inside Login";
     }
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
