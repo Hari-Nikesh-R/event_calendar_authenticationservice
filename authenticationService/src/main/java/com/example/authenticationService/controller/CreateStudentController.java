@@ -3,6 +3,7 @@ package com.example.authenticationService.controller;
 import com.example.authenticationService.model.StudentDetails;
 import com.example.authenticationService.services.CreateStudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ public class CreateStudentController {
     CreateStudentService createStudentService;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public StudentDetails register(@RequestBody StudentDetails studentDetails) {
         return createStudentService.save(studentDetails);
 

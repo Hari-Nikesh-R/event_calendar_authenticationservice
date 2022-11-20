@@ -4,6 +4,8 @@ import com.example.authenticationService.dtos.AuthDto;
 import com.example.authenticationService.model.StudentDetails;
 import com.example.authenticationService.repository.UserDetailsInformation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,7 +14,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+
+import static com.example.authenticationService.Utils.Configuration.AUTHORITIES_KEY;
 
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
@@ -29,9 +34,12 @@ public class JwtUserDetailsService implements UserDetailsService {
 //            authDto.setRole(userCred.get().getRole());
 //            return authDto;
 //        }
+
+        List<GrantedAuthority> grantedAuthorityList = new ArrayList<>();
+        grantedAuthorityList.add(new SimpleGrantedAuthority(AUTHORITIES_KEY));
         if("javai".equals(username))
         {
-            return new User(username,bCryptPasswordEncoder.encode("password"),new ArrayList<>());
+            return new User(username,bCryptPasswordEncoder.encode("password"),grantedAuthorityList);
         }
          else {
             throw new UsernameNotFoundException("User not found with username: " + username);

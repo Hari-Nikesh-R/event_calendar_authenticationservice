@@ -53,7 +53,7 @@ public class WebConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         // We don't need CSRF for this example
         httpSecurity.csrf().disable()
-                // dont authenticate this particular request
+                // don't authenticate this particular request
                 .authorizeRequests().antMatchers("/authenticate").permitAll().
                 // all other requests need to be authenticated
                         anyRequest().authenticated().and().

@@ -1,12 +1,15 @@
 package com.example.authenticationService.config;
 
 import com.example.authenticationService.services.impl.JwtUserDetailsService;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -18,7 +21,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import static com.example.authenticationService.Utils.Configuration.AUTHORITIES_KEY;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -36,7 +43,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String jwtToken = null;
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
             jwtToken = requestTokenHeader.substring(7);
-
             try {
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);
             } catch (IllegalArgumentException e) {
@@ -56,7 +62,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         } else {
             logger.warn("JWT Token does not begin with Bearer String");
         }
-
+        AUTHORITIES_KEY = jwtTokenUtil.getRoleFromToken(jwtToken);
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);

@@ -1,6 +1,7 @@
 package com.example.authenticationService.config;
 
 import io.jsonwebtoken.*;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -57,6 +58,12 @@ public class JwtTokenUtil implements Serializable {
     //for retrieveing any information from token we will need the secret key
     private Claims getAllClaimsFromToken(String token) {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+    }
+
+    public String getRoleFromToken(String token)
+    {
+        Claims claims = getAllClaimsFromToken(token);
+        return (String) claims.get("roles");
     }
 
     //check if the token has expired
