@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.example.authenticationService.Utils.Configuration.AUTHORITIES_KEY;
+import static com.example.authenticationService.Utils.Constants.*;
 
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
@@ -40,7 +41,7 @@ public class JwtUserDetailsService implements UserDetailsService {
         List<GrantedAuthority> grantedAuthorityList = new ArrayList<>();
         grantedAuthorityList.add(new SimpleGrantedAuthority(AUTHORITIES_KEY));
         switch (AUTHORITIES_KEY){
-            case "STUDENT":
+            case STUDENT:
                 Optional<StudentDetails> userCred = userDetailsRepository.findByEmail(username);
                 if(userCred.isPresent()) {
                     if(userCred.get().getEmail().equals(username))
@@ -49,7 +50,7 @@ public class JwtUserDetailsService implements UserDetailsService {
                     }
                 }
                 break;
-            case "ADMIN":
+            case ADMIN:
                 Optional<AdminDetails> adminCred = adminDetailsRepository.findByEmail(username);
                 if(adminCred.isPresent()){
                     if(adminCred.get().getEmail().equals(username))
@@ -58,7 +59,7 @@ public class JwtUserDetailsService implements UserDetailsService {
                     }
                 }
                 break;
-            case "STAFF":
+            case STAFF:
                 Optional<StaffDetails> staffCred = staffDetailsRepository.findByEmail(username);
                 if(staffCred.isPresent())
                 {
@@ -70,15 +71,15 @@ public class JwtUserDetailsService implements UserDetailsService {
                 }
                 break;
             default:
-                throw new UsernameNotFoundException("User not found with username: " + username);
+                throw new UsernameNotFoundException(USER_NOT_FOUND + username);
 
         }
 
 
 
-        if("javai".equals(username))
+        if(DEFAULT_USER.equals(username))
         {
-            return new User(username,bCryptPasswordEncoder.encode("password"),grantedAuthorityList);
+            return new User(username,bCryptPasswordEncoder.encode(DEFAULT_PASSWORD),grantedAuthorityList);
         }
          else {
             throw new UsernameNotFoundException("User not found with username: " + username);
