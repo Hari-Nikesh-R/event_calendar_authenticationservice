@@ -1,8 +1,6 @@
 package com.example.authenticationService.services.impl;
 
-import com.example.authenticationService.dtos.AuthDto;
-import com.example.authenticationService.model.StudentDetails;
-import com.example.authenticationService.repository.UserDetailsInformation;
+import com.example.authenticationService.repository.UserDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static com.example.authenticationService.Utils.Configuration.AUTHORITIES_KEY;
 
@@ -23,7 +20,7 @@ import static com.example.authenticationService.Utils.Configuration.AUTHORITIES_
 public class JwtUserDetailsService implements UserDetailsService {
 
     @Autowired
-    UserDetailsInformation userDetailsInformation;
+    UserDetailsRepository userDetailsRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

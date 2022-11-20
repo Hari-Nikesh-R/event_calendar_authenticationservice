@@ -1,19 +1,19 @@
 package com.example.authenticationService.services.impl;
 
 import com.example.authenticationService.model.StudentDetails;
-import com.example.authenticationService.repository.UserDetailsInformation;
-import com.example.authenticationService.services.CreateStudentService;
+import com.example.authenticationService.repository.UserDetailsRepository;
+import com.example.authenticationService.services.RegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CreateStudentControllerImpl implements CreateStudentService {
+public class CreateStudentServiceImpl implements RegisterService<StudentDetails> {
 
     @Autowired
-    UserDetailsInformation userDetailsInformation;
+    UserDetailsRepository userDetailsRepository;
 
     @Override
     public StudentDetails save(StudentDetails studentDetails) {
-       return userDetailsInformation.save(studentDetails);
+       return userDetailsRepository.save(studentDetails);
     }
 }
