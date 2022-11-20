@@ -14,10 +14,12 @@ public class StaffDetails {
 
     private String firstName;
     private String lastName;
+    private String email;
     private String phoneNumber;
     private String mainHandlingSubject;
     private String careerDescription;
     private String rollNumber;
     private String designation;
+    private String password;
     private String role = "STAFF";
 }

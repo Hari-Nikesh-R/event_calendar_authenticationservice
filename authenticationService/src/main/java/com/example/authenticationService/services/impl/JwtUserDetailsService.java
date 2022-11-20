@@ -1,5 +1,10 @@
 package com.example.authenticationService.services.impl;
 
+import com.example.authenticationService.model.AdminDetails;
+import com.example.authenticationService.model.StaffDetails;
+import com.example.authenticationService.model.StudentDetails;
+import com.example.authenticationService.repository.AdminDetailsRepository;
+import com.example.authenticationService.repository.StaffDetailsRepository;
 import com.example.authenticationService.repository.UserDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.example.authenticationService.Utils.Configuration.AUTHORITIES_KEY;
 
@@ -22,18 +28,54 @@ public class JwtUserDetailsService implements UserDetailsService {
     @Autowired
     UserDetailsRepository userDetailsRepository;
 
+    @Autowired
+    AdminDetailsRepository adminDetailsRepository;
+
+    @Autowired
+    StaffDetailsRepository staffDetailsRepository;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        //Optional<StudentDetails> userCred = userDetailsInformation.findByEmail(username);
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-//        if(username.equals(userCred.get().getEmail()) && userCred.get().getRole().equals("STUDENT")) {
-//            AuthDto authDto = new AuthDto(username,userCred.get().getPassword(),new ArrayList<>());
-//            authDto.setRole(userCred.get().getRole());
-//            return authDto;
-//        }
-
         List<GrantedAuthority> grantedAuthorityList = new ArrayList<>();
         grantedAuthorityList.add(new SimpleGrantedAuthority(AUTHORITIES_KEY));
+        switch (AUTHORITIES_KEY){
+            case "STUDENT":
+                Optional<StudentDetails> userCred = userDetailsRepository.findByEmail(username);
+                if(userCred.isPresent()) {
+                    if(userCred.get().getEmail().equals(username))
+                    {
+                        return new User(username,userCred.get().getPassword(),grantedAuthorityList);
+                    }
+                }
+                break;
+            case "ADMIN":
+                Optional<AdminDetails> adminCred = adminDetailsRepository.findByEmail(username);
+                if(adminCred.isPresent()){
+                    if(adminCred.get().getEmail().equals(username))
+                    {
+                        return new User(username,adminCred.get().getPassword(),grantedAuthorityList);
+                    }
+                }
+                break;
+            case "STAFF":
+                Optional<StaffDetails> staffCred = staffDetailsRepository.findByEmail(username);
+                if(staffCred.isPresent())
+                {
+                    if(staffCred.get().getEmail().equals(username))
+                    {
+                        return new User(username,staffCred.get().getPassword(),grantedAuthorityList);
+                    }
+
+                }
+                break;
+            default:
+                throw new UsernameNotFoundException("User not found with username: " + username);
+
+        }
+
+
+
         if("javai".equals(username))
         {
             return new User(username,bCryptPasswordEncoder.encode("password"),grantedAuthorityList);
