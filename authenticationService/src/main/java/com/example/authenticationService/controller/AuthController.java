@@ -15,9 +15,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.example.authenticationService.Utils.Configuration.AUTHORITIES_KEY;
 
 @RestController
 @CrossOrigin
@@ -30,6 +33,8 @@ public class AuthController {
     private JwtTokenUtil jwtTokenUtil;
     @Autowired
     private JwtUserDetailsService userDetailsService;
+
+    @RolesAllowed("{ADMIN}")
     @RequestMapping(value = "/login",method = RequestMethod.GET)
     public String loginUser()
     {
@@ -39,7 +44,7 @@ public class AuthController {
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
 
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
-
+        AUTHORITIES_KEY = authenticationRequest.getRoles();
         final UserDetails userDetails = userDetailsService
                 .loadUserByUsername(authenticationRequest.getUsername());
 

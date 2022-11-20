@@ -7,15 +7,14 @@ public class JwtRequest implements Serializable {
 
     private String username;
     private String password;
+    private String roles;
 
-    private String role;
-
-    public String getRole() {
-        return role;
+    public String getRoles() {
+        return roles;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setRoles(String roles) {
+        this.roles = roles;
     }
 
     public JwtRequest()

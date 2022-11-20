@@ -22,12 +22,16 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<StudentDetails> userCred = userDetailsInformation.findByEmail(username);
+        //Optional<StudentDetails> userCred = userDetailsInformation.findByEmail(username);
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        if(username.equals(userCred.get().getEmail()) && userCred.get().getRole().equals("STUDENT")) {
-            AuthDto authDto = new AuthDto(username,userCred.get().getPassword(),new ArrayList<>());
-            authDto.setRole(userCred.get().getRole());
-            return authDto;
+//        if(username.equals(userCred.get().getEmail()) && userCred.get().getRole().equals("STUDENT")) {
+//            AuthDto authDto = new AuthDto(username,userCred.get().getPassword(),new ArrayList<>());
+//            authDto.setRole(userCred.get().getRole());
+//            return authDto;
+//        }
+        if("javai".equals(username))
+        {
+            return new User(username,bCryptPasswordEncoder.encode("password"),new ArrayList<>());
         }
          else {
             throw new UsernameNotFoundException("User not found with username: " + username);
