@@ -2,25 +2,21 @@ package com.example.authenticationService.dtos;
 
 
 import lombok.Data;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 
-@Data
-public class AuthDto {
-    private String userName;
-    private String password;
+import java.util.Collection;
 
-    public String getUserName() {
-        return userName;
+public class AuthDto extends User {
+
+    private String role;
+    public AuthDto(String username, String password, Collection<? extends GrantedAuthority> authorities) {
+        super(username, password, authorities);
     }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public String getRole() {
+        return role;
     }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+    public void setRole(String role) {
+        this.role = role;
     }
 }

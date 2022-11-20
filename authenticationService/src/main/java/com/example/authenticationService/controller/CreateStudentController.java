@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/sign-up/student")
+@RequestMapping(value = "/register/student")
 public class CreateStudentController {
 
     @Autowired
     CreateStudentService createStudentService;
 
     @PostMapping
-    public StudentDetails save(@RequestBody StudentDetails studentDetails) {
+    public StudentDetails register(@RequestBody StudentDetails studentDetails) {
         return createStudentService.save(studentDetails);
 
     }

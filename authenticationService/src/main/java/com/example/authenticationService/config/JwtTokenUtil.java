@@ -4,10 +4,13 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -65,6 +68,19 @@ public class JwtTokenUtil implements Serializable {
     //generate token for user
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
+        Collection<? extends GrantedAuthority> roles = userDetails.getAuthorities();
+        if(roles.contains(new SimpleGrantedAuthority("STUDENT")))
+        {
+            claims.put("STUDENT",true);
+        }
+        if(roles.contains(new SimpleGrantedAuthority("ADMIN")))
+        {
+            claims.put("ADMIN",true);
+        }
+        if(roles.contains(new SimpleGrantedAuthority("STAFF")))
+        {
+            claims.put("STAFF",true);
+        }
         return doGenerateToken(claims, userDetails.getUsername());
     }
 
@@ -72,7 +88,7 @@ public class JwtTokenUtil implements Serializable {
 
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + refreshExpirationDateInMs))
-                .signWith(SignatureAlgorithm.HS512, secret).compact();
+                .signWith(SignatureAlgorithm.HS384, secret).compact();
 
     }
 
