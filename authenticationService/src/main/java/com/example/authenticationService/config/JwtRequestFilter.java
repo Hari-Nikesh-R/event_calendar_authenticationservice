@@ -62,7 +62,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         } else {
             logger.warn("JWT Token does not begin with Bearer String");
         }
-        AUTHORITIES_KEY = jwtTokenUtil.getRoleFromToken(jwtToken);
+        if(jwtToken!=null) {
+            AUTHORITIES_KEY = jwtTokenUtil.getRoleFromToken(jwtToken);
+        }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
