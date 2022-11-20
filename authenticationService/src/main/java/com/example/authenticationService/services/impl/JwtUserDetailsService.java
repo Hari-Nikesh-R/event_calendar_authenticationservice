@@ -40,32 +40,31 @@ public class JwtUserDetailsService implements UserDetailsService {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         List<GrantedAuthority> grantedAuthorityList = new ArrayList<>();
         grantedAuthorityList.add(new SimpleGrantedAuthority(AUTHORITIES_KEY));
-        switch (AUTHORITIES_KEY){
+        if (DEFAULT_USER.equals(username)) {
+            return new User(username, bCryptPasswordEncoder.encode(DEFAULT_PASSWORD), grantedAuthorityList);
+        }
+        switch (AUTHORITIES_KEY) {
             case STUDENT:
                 Optional<StudentDetails> userCred = userDetailsRepository.findByEmail(username);
-                if(userCred.isPresent()) {
-                    if(userCred.get().getEmail().equals(username))
-                    {
-                        return new User(username,userCred.get().getPassword(),grantedAuthorityList);
+                if (userCred.isPresent()) {
+                    if (userCred.get().getEmail().equals(username)) {
+                        return new User(username, userCred.get().getPassword(), grantedAuthorityList);
                     }
                 }
                 break;
             case ADMIN:
                 Optional<AdminDetails> adminCred = adminDetailsRepository.findByEmail(username);
-                if(adminCred.isPresent()){
-                    if(adminCred.get().getEmail().equals(username))
-                    {
-                        return new User(username,adminCred.get().getPassword(),grantedAuthorityList);
+                if (adminCred.isPresent()) {
+                    if (adminCred.get().getEmail().equals(username)) {
+                        return new User(username, adminCred.get().getPassword(), grantedAuthorityList);
                     }
                 }
                 break;
             case STAFF:
                 Optional<StaffDetails> staffCred = staffDetailsRepository.findByEmail(username);
-                if(staffCred.isPresent())
-                {
-                    if(staffCred.get().getEmail().equals(username))
-                    {
-                        return new User(username,staffCred.get().getPassword(),grantedAuthorityList);
+                if (staffCred.isPresent()) {
+                    if (staffCred.get().getEmail().equals(username)) {
+                        return new User(username, staffCred.get().getPassword(), grantedAuthorityList);
                     }
 
                 }
@@ -74,15 +73,6 @@ public class JwtUserDetailsService implements UserDetailsService {
                 throw new UsernameNotFoundException(USER_NOT_FOUND + username);
 
         }
-
-
-
-        if(DEFAULT_USER.equals(username))
-        {
-            return new User(username,bCryptPasswordEncoder.encode(DEFAULT_PASSWORD),grantedAuthorityList);
-        }
-         else {
-            throw new UsernameNotFoundException("User not found with username: " + username);
-        }
+        throw new UsernameNotFoundException(USER_NOT_FOUND + username);
     }
 }

@@ -11,7 +11,7 @@ import static com.example.authenticationService.Utils.Constants.STAFF_ACCESS;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping(value = "/register/#student")
+@RequestMapping(value = "/register/student")
 public class CreateStudentController {
 
     @Autowired

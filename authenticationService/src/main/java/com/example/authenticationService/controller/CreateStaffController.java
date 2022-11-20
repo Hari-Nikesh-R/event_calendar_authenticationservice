@@ -4,16 +4,13 @@ import com.example.authenticationService.model.StaffDetails;
 import com.example.authenticationService.services.RegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static com.example.authenticationService.Utils.Constants.ADMIN_ACCESS;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping(value = "/register/#staff")
+@RequestMapping(value = "/register/staff")
 public class CreateStaffController {
 
     @Autowired
@@ -21,7 +18,7 @@ public class CreateStaffController {
 
     @PostMapping
     @PreAuthorize(ADMIN_ACCESS)
-    public StaffDetails registerStaff(StaffDetails staffDetails){
+    public StaffDetails registerStaff(@RequestBody StaffDetails staffDetails){
         return createStaffService.save(staffDetails);
     }
 }

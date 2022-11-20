@@ -4,16 +4,13 @@ import com.example.authenticationService.model.AdminDetails;
 import com.example.authenticationService.services.RegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static com.example.authenticationService.Utils.Constants.ADMIN_ACCESS;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping(value = "/register/#admin")
+@RequestMapping(value = "/register/admin")
 public class CreateAdminController {
 
     @Autowired
@@ -21,7 +18,7 @@ public class CreateAdminController {
 
     @PostMapping
     @PreAuthorize(ADMIN_ACCESS)
-    public AdminDetails registerAdmin(AdminDetails adminDetails)
+    public AdminDetails registerAdmin(@RequestBody AdminDetails adminDetails)
     {
         return createAdminService.save(adminDetails);
     }
