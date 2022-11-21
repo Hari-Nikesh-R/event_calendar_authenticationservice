@@ -7,14 +7,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class CreateStaffServiceImpl implements RegisterService<StaffDetails> {
 
     @Autowired
     StaffDetailsRepository staffDetailsInformation;
 
+
+
     @Override
     public StaffDetails save(StaffDetails staffDetails) {
+        Optional<StaffDetails> optionalStaffDetails = staffDetailsInformation.findByEmail(staffDetails.getEmail());
+        if(optionalStaffDetails.isPresent())
+        {
+            return null;
+        }
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         String password = bCryptPasswordEncoder.encode(staffDetails.getPassword());
         staffDetails.setPassword(password);
