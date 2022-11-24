@@ -26,10 +26,10 @@ public class CreateStaffController {
     public BaseResponse<StaffDetails> registerStaff(@RequestBody StaffDetails staffDetails){
         StaffDetails details = createStaffService.save(staffDetails);
         if(Objects.nonNull(details)){
-            return new BaseResponse<>(HttpStatus.CREATED.getReasonPhrase(), HttpStatus.OK.value(),true,"",staffDetails);
+            return new BaseResponse<>(HttpStatus.CREATED.getReasonPhrase(), HttpStatus.OK.value(),true,"",details);
         }
         else{
-            return new BaseResponse<>(HttpStatus.ALREADY_REPORTED.getReasonPhrase(), HttpStatus.ALREADY_REPORTED.value(), false, "User Already Exist",staffDetails);
+            return new BaseResponse<>(HttpStatus.ALREADY_REPORTED.getReasonPhrase(), HttpStatus.ALREADY_REPORTED.value(), false, "User Already Exist",null);
         }
     }
 }

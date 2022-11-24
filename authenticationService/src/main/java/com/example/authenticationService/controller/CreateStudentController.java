@@ -27,10 +27,10 @@ public class CreateStudentController {
     public BaseResponse<StudentDetails> registerStudent(@RequestBody StudentDetails studentDetails) {
         StudentDetails details = createStudentService.save(studentDetails);
         if(Objects.nonNull(details)){
-            return new BaseResponse<>(HttpStatus.CREATED.getReasonPhrase(), HttpStatus.OK.value(),true,"",studentDetails);
+            return new BaseResponse<>(HttpStatus.CREATED.getReasonPhrase(), HttpStatus.OK.value(),true,"",details);
         }
         else{
-            return new BaseResponse<>(HttpStatus.ALREADY_REPORTED.getReasonPhrase(), HttpStatus.ALREADY_REPORTED.value(), false, "User Already Exist",studentDetails);
+            return new BaseResponse<>(HttpStatus.ALREADY_REPORTED.getReasonPhrase(), HttpStatus.ALREADY_REPORTED.value(), false, "User Already Exist",null);
         }
 
     }
