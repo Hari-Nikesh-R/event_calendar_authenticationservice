@@ -21,6 +21,7 @@ public class StudentDetails{
     private String alterPhoneNumber;
     private double CGPA;
     private String department;
+    private String section;
     private String collegeRollNumber;
     private String RegisterNumber;
     private String password;
