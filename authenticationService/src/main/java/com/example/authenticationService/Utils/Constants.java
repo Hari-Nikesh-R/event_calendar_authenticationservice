@@ -10,6 +10,8 @@ public interface Constants {
     String DEFAULT_PASSWORD = "password";
     String ADMIN_ACCESS = "hasAuthority('ADMIN')";
     String STAFF_ACCESS = "hasAuthority('STAFF')";
+
+    String STUDENT_ACCESS = "hasAuthority('STUDENT')";
     String CLAIMS_ATTR = "claims";
     String SUB = "sub";
 

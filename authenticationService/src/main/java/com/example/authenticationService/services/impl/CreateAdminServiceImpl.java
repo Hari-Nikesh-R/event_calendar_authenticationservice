@@ -1,6 +1,8 @@
 package com.example.authenticationService.services.impl;
 
+import com.example.authenticationService.dtos.UpdatePassword;
 import com.example.authenticationService.model.AdminDetails;
+import com.example.authenticationService.model.StaffDetails;
 import com.example.authenticationService.repository.AdminDetailsRepository;
 import com.example.authenticationService.services.FetchInfoService;
 import com.example.authenticationService.services.RegisterService;
@@ -9,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -36,12 +39,25 @@ public class CreateAdminServiceImpl implements RegisterService<AdminDetails>, Fe
 
     @Override
     public Integer getId(String email) {
-        return null;
+        Optional<Integer> optionalAdminId = adminDetailsRepository.fetchId(email);
+        return optionalAdminId.orElse(null);
     }
-
 
     @Override
     public AdminDetails getInfoById(Integer id) {
-        return null;
+        Optional<AdminDetails>  optionalAdminDetails = adminDetailsRepository.findById(id);
+        return optionalAdminDetails.orElse(null);
+    }
+
+    @Override
+    public String changePassword(UpdatePassword updatePassword) {
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        AdminDetails adminDetails = getInfoById(updatePassword.getId());
+        if(Objects.nonNull(adminDetails)) {
+            adminDetails.setPassword(bCryptPasswordEncoder.encode(updatePassword.getPassword()));
+            adminDetailsRepository.save(adminDetails);
+            return "Password Updated Successfully";
+        }
+        return "Failed to Update password";
     }
 }

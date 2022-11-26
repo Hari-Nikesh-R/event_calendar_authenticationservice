@@ -1,6 +1,8 @@
 package com.example.authenticationService.services.impl;
 
+import com.example.authenticationService.dtos.UpdatePassword;
 import com.example.authenticationService.model.StaffDetails;
+import com.example.authenticationService.model.StudentDetails;
 import com.example.authenticationService.repository.StaffDetailsRepository;
 import com.example.authenticationService.services.FetchInfoService;
 import com.example.authenticationService.services.RegisterService;
@@ -9,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -32,17 +35,34 @@ public class CreateStaffServiceImpl implements RegisterService<StaffDetails>, Fe
 
     @Override
     public List<StaffDetails> getAllInfo() {
-        return null;
+        List<StaffDetails> staffDetails = staffDetailsInformation.findAll();
+        for(StaffDetails staffDetail : staffDetails)
+        {
+            staffDetail.setPassword("");
+        }
+        return staffDetails;
     }
 
     @Override
     public Integer getId(String email) {
-        return null;
+        Optional<Integer> optionalStaffId = staffDetailsInformation.fetchId(email);
+        return optionalStaffId.orElse(null);
     }
-
-
     @Override
     public StaffDetails getInfoById(Integer id) {
-        return null;
+        Optional<StaffDetails>  optionalStaffDetails = staffDetailsInformation.findById(id);
+        return optionalStaffDetails.orElse(null);
+    }
+
+    @Override
+    public String changePassword(UpdatePassword updatePassword) {
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        StaffDetails staffDetails = getInfoById(updatePassword.getId());
+        if(Objects.nonNull(staffDetails)) {
+            staffDetails.setPassword(bCryptPasswordEncoder.encode(updatePassword.getPassword()));
+            staffDetailsInformation.save(staffDetails);
+            return "Password Updated Successfully";
+        }
+        return "Failed to Update password";
     }
 }
