@@ -1,5 +1,8 @@
 package com.example.authenticationService.services.impl;
 
+import com.example.authenticationService.controller.StudentController;
+import com.example.authenticationService.dtos.UpdatePassword;
+import com.example.authenticationService.model.StaffDetails;
 import com.example.authenticationService.model.StudentDetails;
 import com.example.authenticationService.repository.UserDetailsRepository;
 import com.example.authenticationService.services.FetchInfoService;
@@ -9,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -53,5 +57,17 @@ public class CreateStudentServiceImpl implements RegisterService<StudentDetails>
         Optional<StudentDetails>  optionalStudentDetails = userDetailsRepository.findById(id);
         return optionalStudentDetails.orElse(null);
 
+    }
+
+    @Override
+    public String changePassword(UpdatePassword updatePassword) {
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        StudentDetails studentDetails = getInfoById(updatePassword.getId());
+        if(Objects.nonNull(studentDetails)) {
+            studentDetails.setPassword(bCryptPasswordEncoder.encode(updatePassword.getPassword()));
+            userDetailsRepository.save(studentDetails);
+            return "Password Updated Successfully";
+        }
+        return "Failed to Update password";
     }
 }
