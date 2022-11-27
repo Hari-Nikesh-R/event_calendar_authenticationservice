@@ -1,6 +1,6 @@
 package com.example.authenticationService.controller;
 
-import com.example.authenticationService.Utils.Utility;
+import com.example.authenticationService.config.JwtTokenUtil;
 import com.example.authenticationService.dtos.BaseResponse;
 import com.example.authenticationService.model.AdminDetails;
 import com.example.authenticationService.model.StaffDetails;
@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
 
-import static com.example.authenticationService.Utils.Constants.ADMIN_ACCESS;
-import static com.example.authenticationService.Utils.Constants.STAFF_ACCESS;
+import static com.example.authenticationService.Utils.Constants.*;
+import static com.example.authenticationService.Utils.Urls.*;
 
 @RestController
 @CrossOrigin("*")
@@ -28,69 +28,48 @@ public class CreateController {
     @Autowired
     RegisterService<StudentDetails> createStudentService;
 
-    @PostMapping(value = "/admin")
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
+    @PostMapping(value = ADMIN_URL)
     @PreAuthorize(ADMIN_ACCESS)
     public BaseResponse<AdminDetails> registerAdmin(@RequestBody AdminDetails adminDetails)
     {
-        AdminDetails details=null;
-        boolean isValidPassword = Utility.validatePassword(adminDetails.getPassword());
-        if(isValidPassword) {
-             details = createAdminService.save(adminDetails);
+        AdminDetails details = createAdminService.save(adminDetails);
+        if(Objects.nonNull(details)){
+            return new BaseResponse<>(HttpStatus.CREATED.getReasonPhrase(), HttpStatus.OK.value(),true,"",details);
         }
-            if (Objects.nonNull(details)){
-                return new BaseResponse<>(HttpStatus.CREATED.getReasonPhrase(), HttpStatus.OK.value(), true, "", details);
-            }
-        else {
-            if(!isValidPassword)
-            {
-                return new BaseResponse<>(HttpStatus.NOT_ACCEPTABLE.toString(), HttpStatus.NOT_ACCEPTABLE.value(), false,"Invalid Password",null);
-            }
-                return new BaseResponse<>(HttpStatus.ALREADY_REPORTED.getReasonPhrase(), HttpStatus.ALREADY_REPORTED.value(), false, "User Already Exist", null);
-            }
+        else{
+            return new BaseResponse<>(HttpStatus.ALREADY_REPORTED.getReasonPhrase(), HttpStatus.ALREADY_REPORTED.value(), false, "User Already Exist", null);
+        }
 
 
     }
 
 
 
-    @PostMapping(value = "/staff")
+    @PostMapping(value = STAFF_URL)
     @PreAuthorize(ADMIN_ACCESS)
-    public BaseResponse<StaffDetails> registerStaff(@RequestBody StaffDetails staffDetails){
-        StaffDetails details=null;
-        boolean isValidPassword = Utility.validatePassword(staffDetails.getPassword());
-        if(isValidPassword){
-            details = createStaffService.save(staffDetails);
-        }
+    public BaseResponse<StaffDetails> registerStaff(@RequestBody StaffDetails staffDetails,@RequestHeader(AUTHORIZATION) String token){
+        staffDetails.setCreatedBy(jwtTokenUtil.getUsernameFromToken(token.replace("Bearer ","")));
+        StaffDetails details = createStaffService.save(staffDetails);
         if(Objects.nonNull(details)){
             return new BaseResponse<>(HttpStatus.CREATED.getReasonPhrase(), HttpStatus.OK.value(),true,"",details);
         }
         else{
-            if(!isValidPassword)
-            {
-                return new BaseResponse<>(HttpStatus.NOT_ACCEPTABLE.toString(), HttpStatus.NOT_ACCEPTABLE.value(), false,"Invalid Password",null);
-            }
             return new BaseResponse<>(HttpStatus.ALREADY_REPORTED.getReasonPhrase(), HttpStatus.ALREADY_REPORTED.value(), false, "User Already Exist",null);
         }
     }
 
 
-    @PostMapping(value = "/student")
+    @PostMapping(value = STUDENT_URL)
     @PreAuthorize(ADMIN_ACCESS + " or " + STAFF_ACCESS)
-    public BaseResponse<StudentDetails> registerStudent(@RequestBody StudentDetails studentDetails) {
-        StudentDetails details=null;
-        boolean isValidPassword = Utility.validatePassword(studentDetails.getPassword());
-        if(isValidPassword) {
-             details = createStudentService.save(studentDetails);
-        }
+    public BaseResponse<StudentDetails> registerStudent(@RequestBody StudentDetails studentDetails,@RequestHeader(AUTHORIZATION) String token) {
+        studentDetails.setCreatedBy(jwtTokenUtil.getUsernameFromToken(token.replace("Bearer ","")));
+        StudentDetails details = createStudentService.save(studentDetails);
         if(Objects.nonNull(details)){
             return new BaseResponse<>(HttpStatus.CREATED.getReasonPhrase(), HttpStatus.OK.value(),true,"",details);
         }
         else{
-
-            if(!isValidPassword)
-            {
-                return new BaseResponse<>(HttpStatus.NOT_ACCEPTABLE.toString(), HttpStatus.NOT_ACCEPTABLE.value(), false,"Invalid Password",null);
-            }
             return new BaseResponse<>(HttpStatus.ALREADY_REPORTED.getReasonPhrase(), HttpStatus.ALREADY_REPORTED.value(), false, "User Already Exist",null);
         }
 

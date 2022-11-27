@@ -11,10 +11,14 @@ public interface Constants {
     String ADMIN_ACCESS = "hasAuthority('ADMIN')";
     String STAFF_ACCESS = "hasAuthority('STAFF')";
 
+    String AUTHORIZATION = "Authorization";
+
     String STUDENT_ACCESS = "hasAuthority('STUDENT')";
     String CLAIMS_ATTR = "claims";
     String PASSWORD_VALIDATION = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,20}$";
     String SUB = "sub";
+
+    String OR = " or ";
 
 
 

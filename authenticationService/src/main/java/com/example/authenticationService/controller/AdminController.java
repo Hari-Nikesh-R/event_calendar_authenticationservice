@@ -14,11 +14,12 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Objects;
 
 import static com.example.authenticationService.Utils.Constants.ADMIN_ACCESS;
-import static com.example.authenticationService.Utils.Urls.AUTHENTICATION_URL;
+import static com.example.authenticationService.Utils.Constants.AUTHORIZATION;
+import static com.example.authenticationService.Utils.Urls.*;
 
 
 @RestController
-@RequestMapping("/admin")
+@RequestMapping(ADMIN_URL)
 @PreAuthorize(ADMIN_ACCESS)
 public class AdminController {
 
@@ -41,8 +42,8 @@ public class AdminController {
         return new BaseResponse<>(HttpStatus.NO_CONTENT.toString(), HttpStatus.NO_CONTENT.value(), false,"No Admin User Found",null);
     }
 
-    @GetMapping(value = "/fetch-id")
-    public Integer getAdminId(@RequestHeader("Authorization") String token){
+    @GetMapping(value = FETCH_ID)
+    public Integer getAdminId(@RequestHeader(AUTHORIZATION) String token){
         token = token.replace("Bearer ","");
         String email =jwtTokenUtil.getUsernameFromToken(token);
         Integer adminInfoId = adminDetailsIntegerFetchInfoService.getId(email);
@@ -52,11 +53,11 @@ public class AdminController {
         return -1;
     }
     @PutMapping(value = "/update/password")
-    public BaseResponse<String> updatePassword(@RequestBody UpdatePassword updatePassword, @RequestHeader("Authorization") String token){
+    public BaseResponse<String> updatePassword(@RequestBody UpdatePassword updatePassword, @RequestHeader(AUTHORIZATION) String token){
         HttpEntity<String> entity = setTokenInHeaders(token);
         Integer id = restTemplate.exchange(AUTHENTICATION_URL + "/admin/fetch-id", HttpMethod.GET,entity,Integer.class).getBody();
         updatePassword.setId(id);
-        String isUpdated = adminDetailsIntegerFetchInfoService.changePassword(updatePassword);
+        String isUpdated = adminDetailsIntegerFetchInfoService.changePassword(updatePassword,false);
         if(Objects.nonNull(isUpdated))
         {
             return new BaseResponse<>("Updated", HttpStatus.OK.value(), true,"",isUpdated);

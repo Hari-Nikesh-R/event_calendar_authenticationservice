@@ -50,7 +50,7 @@ public class CreateAdminServiceImpl implements RegisterService<AdminDetails>, Fe
     }
 
     @Override
-    public String changePassword(UpdatePassword updatePassword) {
+    public String changePassword(UpdatePassword updatePassword,Boolean isResetPassword) {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         AdminDetails adminDetails = getInfoById(updatePassword.getId());
         if(Objects.nonNull(adminDetails)) {

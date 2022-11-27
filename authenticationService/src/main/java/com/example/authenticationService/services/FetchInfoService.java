@@ -9,5 +9,5 @@ public interface FetchInfoService<T,K> {
     K getId(String email);
     T getInfoById(Integer id);
 
-    String changePassword(UpdatePassword updatePassword);
+    String changePassword(UpdatePassword updatePassword,Boolean isResetPassword);
 }

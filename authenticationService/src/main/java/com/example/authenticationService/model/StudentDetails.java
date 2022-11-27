@@ -25,6 +25,7 @@ public class StudentDetails{
     private String collegeRollNumber;
     private String RegisterNumber;
     private String password;
+    private String createdBy;
     private String role = "STUDENT";
     private String academicYear;
 
