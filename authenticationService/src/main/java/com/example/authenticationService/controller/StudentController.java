@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.example.authenticationService.Utils.Constants.*;
-import static com.example.authenticationService.Utils.Urls.AUTHENTICATION_URL;
+import static com.example.authenticationService.Utils.Urls.*;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping(value = "/student")
+@RequestMapping(value =STUDENT_URL)
 
 public class StudentController {
     @Autowired
@@ -38,8 +38,8 @@ public class StudentController {
         return new BaseResponse<>(HttpStatus.NO_CONTENT.toString(), HttpStatus.NO_CONTENT.value(), false,"No Student Found",null);
     }
 
-    @GetMapping(value = "/fetch-id")
-    public Integer getStudentId(@RequestHeader("Authorization") String token){
+    @GetMapping(value = FETCH_ID)
+    public Integer getStudentId(@RequestHeader(AUTHORIZATION) String token){
         token = token.replace("Bearer ","");
         String email =jwtTokenUtil.getUsernameFromToken(token);
         Integer studentInfoId = studentDetailsFetchInfoService.getId(email);
@@ -59,7 +59,7 @@ public class StudentController {
         return new BaseResponse<>(HttpStatus.NO_CONTENT.toString(),HttpStatus.NO_CONTENT.value(),true,"No Students found",null);
     }
     @PutMapping(value = "/update/password")
-    public BaseResponse<String> updatePassword(@RequestBody UpdatePassword updatePassword, @RequestHeader("Authorization") String token){
+    public BaseResponse<String> updatePassword(@RequestBody UpdatePassword updatePassword, @RequestHeader(AUTHORIZATION) String token){
         HttpEntity<String> entity = setTokenInHeaders(token);
         Integer id = restTemplate.exchange(AUTHENTICATION_URL + "/student/fetch-id", HttpMethod.GET,entity,Integer.class).getBody();
         updatePassword.setId(id);
@@ -72,7 +72,7 @@ public class StudentController {
     }
     @PutMapping(value = "/reset/password")
     @PreAuthorize(ADMIN_ACCESS+" or "+STAFF_ACCESS)
-    public BaseResponse<String> resetStudentPassword(@RequestHeader("Authorization") String token, @RequestBody UpdatePassword updatePassword){
+    public BaseResponse<String> resetStudentPassword(@RequestHeader(AUTHORIZATION) String token, @RequestBody UpdatePassword updatePassword){
         Integer id = studentDetailsFetchInfoService.getId(updatePassword.getEmail());
         updatePassword.setId(id);
         String isUpdated = studentDetailsFetchInfoService.changePassword(updatePassword,true);

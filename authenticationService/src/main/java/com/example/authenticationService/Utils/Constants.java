@@ -11,9 +11,13 @@ public interface Constants {
     String ADMIN_ACCESS = "hasAuthority('ADMIN')";
     String STAFF_ACCESS = "hasAuthority('STAFF')";
 
+    String AUTHORIZATION = "Authorization";
+
     String STUDENT_ACCESS = "hasAuthority('STUDENT')";
     String CLAIMS_ATTR = "claims";
     String SUB = "sub";
+
+    String OR = " or ";
 
 
 
