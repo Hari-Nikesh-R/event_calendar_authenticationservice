@@ -1,5 +1,6 @@
 package com.example.authenticationService.controller;
 
+import com.example.authenticationService.Utils.Utility;
 import com.example.authenticationService.dtos.BaseResponse;
 import com.example.authenticationService.model.AdminDetails;
 import com.example.authenticationService.model.StaffDetails;
@@ -31,13 +32,16 @@ public class CreateController {
     @PreAuthorize(ADMIN_ACCESS)
     public BaseResponse<AdminDetails> registerAdmin(@RequestBody AdminDetails adminDetails)
     {
-        AdminDetails details = createAdminService.save(adminDetails);
-        if(Objects.nonNull(details)){
-            return new BaseResponse<>(HttpStatus.CREATED.getReasonPhrase(), HttpStatus.OK.value(),true,"",details);
+        AdminDetails details=null;
+        if(Utility.validatePassword(adminDetails.getPassword())) {
+             details = createAdminService.save(adminDetails);
         }
-        else{
-            return new BaseResponse<>(HttpStatus.ALREADY_REPORTED.getReasonPhrase(), HttpStatus.ALREADY_REPORTED.value(), false, "User Already Exist", null);
-        }
+            if (Objects.nonNull(details)){
+                return new BaseResponse<>(HttpStatus.CREATED.getReasonPhrase(), HttpStatus.OK.value(), true, "", details);
+            }
+        else {
+                return new BaseResponse<>(HttpStatus.ALREADY_REPORTED.getReasonPhrase(), HttpStatus.ALREADY_REPORTED.value(), false, "User Already Exist", null);
+            }
 
 
     }
@@ -47,7 +51,10 @@ public class CreateController {
     @PostMapping(value = "/staff")
     @PreAuthorize(ADMIN_ACCESS)
     public BaseResponse<StaffDetails> registerStaff(@RequestBody StaffDetails staffDetails){
-        StaffDetails details = createStaffService.save(staffDetails);
+           StaffDetails details=null;
+        if(Utility.validatePassword(staffDetails.getPassword())){
+            details = createStaffService.save(staffDetails);
+        }
         if(Objects.nonNull(details)){
             return new BaseResponse<>(HttpStatus.CREATED.getReasonPhrase(), HttpStatus.OK.value(),true,"",details);
         }
@@ -60,7 +67,10 @@ public class CreateController {
     @PostMapping(value = "/student")
     @PreAuthorize(ADMIN_ACCESS + " or " + STAFF_ACCESS)
     public BaseResponse<StudentDetails> registerStudent(@RequestBody StudentDetails studentDetails) {
-        StudentDetails details = createStudentService.save(studentDetails);
+        StudentDetails details=null;
+        if(Utility.validatePassword(studentDetails.getPassword())) {
+             details = createStudentService.save(studentDetails);
+        }
         if(Objects.nonNull(details)){
             return new BaseResponse<>(HttpStatus.CREATED.getReasonPhrase(), HttpStatus.OK.value(),true,"",details);
         }
