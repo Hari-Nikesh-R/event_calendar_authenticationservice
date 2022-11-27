@@ -72,10 +72,8 @@ public class StudentController {
     }
     @PutMapping(value = "/reset/password")
     @PreAuthorize(ADMIN_ACCESS+" or "+STAFF_ACCESS)
-    public BaseResponse<String> resetStudentPassword(@RequestHeader("Authorization") String token){
-        HttpEntity<String> entity = setTokenInHeaders(token);
-        Integer id = restTemplate.exchange(AUTHENTICATION_URL+"/student/fetch-id",HttpMethod.GET,entity,Integer.class).getBody();
-        UpdatePassword updatePassword = new UpdatePassword();
+    public BaseResponse<String> resetStudentPassword(@RequestHeader("Authorization") String token, @RequestBody UpdatePassword updatePassword){
+        Integer id = studentDetailsFetchInfoService.getId(updatePassword.getEmail());
         updatePassword.setId(id);
         String isUpdated = studentDetailsFetchInfoService.changePassword(updatePassword,true);
         if(!isUpdated.startsWith("Failed"))
