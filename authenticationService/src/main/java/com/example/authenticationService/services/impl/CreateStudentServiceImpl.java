@@ -60,13 +60,21 @@ public class CreateStudentServiceImpl implements RegisterService<StudentDetails>
     }
 
     @Override
-    public String changePassword(UpdatePassword updatePassword) {
+    public String changePassword(UpdatePassword updatePassword,Boolean isResetPassword) {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         StudentDetails studentDetails = getInfoById(updatePassword.getId());
+
         if(Objects.nonNull(studentDetails)) {
-            studentDetails.setPassword(bCryptPasswordEncoder.encode(updatePassword.getPassword()));
-            userDetailsRepository.save(studentDetails);
-            return "Password Updated Successfully";
+            if(isResetPassword){
+                studentDetails.setPassword(bCryptPasswordEncoder.encode("Student@123"));
+                userDetailsRepository.save(studentDetails);
+                return "Password Reset Successful";
+            }
+            else {
+                studentDetails.setPassword(bCryptPasswordEncoder.encode(updatePassword.getPassword()));
+                userDetailsRepository.save(studentDetails);
+                return "Password Updated Successfully";
+            }
         }
         return "Failed to Update password";
     }

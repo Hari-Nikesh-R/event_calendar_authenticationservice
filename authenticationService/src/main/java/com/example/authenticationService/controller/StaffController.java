@@ -14,14 +14,13 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Objects;
 
-import static com.example.authenticationService.Utils.Constants.ADMIN_ACCESS;
-import static com.example.authenticationService.Utils.Constants.STAFF_ACCESS;
-import static com.example.authenticationService.Utils.Urls.AUTHENTICATION_URL;
+import static com.example.authenticationService.Utils.Constants.*;
+import static com.example.authenticationService.Utils.Urls.*;
 
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping(value = "/staff")
+@RequestMapping(value = STAFF_URL)
 public class StaffController {
 
     @Autowired
@@ -44,9 +43,9 @@ public class StaffController {
         return new BaseResponse<>(HttpStatus.NO_CONTENT.toString(), HttpStatus.NO_CONTENT.value(), false,"No Staff Found",null);
     }
 
-    @GetMapping(value = "/fetch-id")
+    @GetMapping(value = FETCH_ID)
     @PreAuthorize(ADMIN_ACCESS+" or "+STAFF_ACCESS)
-    public Integer getStaffId(@RequestHeader("Authorization") String token){
+    public Integer getStaffId(@RequestHeader(AUTHORIZATION) String token){
         token = token.replace("Bearer ","");
         String email =jwtTokenUtil.getUsernameFromToken(token);
         Integer staffInfoId = staffDetailsIntegerFetchInfoService.getId(email);
@@ -65,11 +64,11 @@ public class StaffController {
     }
 
     @PutMapping(value = "/update/password")
-    public BaseResponse<String> updatePassword(@RequestBody UpdatePassword updatePassword, @RequestHeader("Authorization") String token){
+    public BaseResponse<String> updatePassword(@RequestBody UpdatePassword updatePassword, @RequestHeader(AUTHORIZATION) String token){
         HttpEntity<String> entity = setTokenInHeaders(token);
         Integer id = restTemplate.exchange(AUTHENTICATION_URL + "/staff/fetch-id", HttpMethod.GET,entity,Integer.class).getBody();
         updatePassword.setId(id);
-        String isUpdated = staffDetailsIntegerFetchInfoService.changePassword(updatePassword);
+        String isUpdated = staffDetailsIntegerFetchInfoService.changePassword(updatePassword,false);
         if(Objects.nonNull(isUpdated))
         {
             return new BaseResponse<>("Updated", HttpStatus.OK.value(), true,"",isUpdated);
@@ -79,7 +78,7 @@ public class StaffController {
 
     private HttpEntity<String> setTokenInHeaders(String token){
         HttpHeaders httpHeaders = getHeaders();
-        httpHeaders.set("Authorization",token);
+        httpHeaders.set(AUTHORIZATION,token);
         return new HttpEntity<>(httpHeaders);
     }
     private HttpHeaders getHeaders() {

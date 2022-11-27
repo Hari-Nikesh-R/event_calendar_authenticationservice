@@ -1,5 +1,6 @@
 package com.example.authenticationService.controller;
 
+import com.example.authenticationService.config.JwtTokenUtil;
 import com.example.authenticationService.dtos.BaseResponse;
 import com.example.authenticationService.model.AdminDetails;
 import com.example.authenticationService.model.StaffDetails;
@@ -12,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
 
-import static com.example.authenticationService.Utils.Constants.ADMIN_ACCESS;
-import static com.example.authenticationService.Utils.Constants.STAFF_ACCESS;
+import static com.example.authenticationService.Utils.Constants.*;
+import static com.example.authenticationService.Utils.Urls.*;
 
 @RestController
 @CrossOrigin("*")
@@ -27,7 +28,9 @@ public class CreateController {
     @Autowired
     RegisterService<StudentDetails> createStudentService;
 
-    @PostMapping(value = "/admin")
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
+    @PostMapping(value = ADMIN_URL)
     @PreAuthorize(ADMIN_ACCESS)
     public BaseResponse<AdminDetails> registerAdmin(@RequestBody AdminDetails adminDetails)
     {
@@ -44,9 +47,10 @@ public class CreateController {
 
 
 
-    @PostMapping(value = "/staff")
+    @PostMapping(value = STAFF_URL)
     @PreAuthorize(ADMIN_ACCESS)
-    public BaseResponse<StaffDetails> registerStaff(@RequestBody StaffDetails staffDetails){
+    public BaseResponse<StaffDetails> registerStaff(@RequestBody StaffDetails staffDetails,@RequestHeader(AUTHORIZATION) String token){
+        staffDetails.setCreatedBy(jwtTokenUtil.getUsernameFromToken(token.replace("Bearer ","")));
         StaffDetails details = createStaffService.save(staffDetails);
         if(Objects.nonNull(details)){
             return new BaseResponse<>(HttpStatus.CREATED.getReasonPhrase(), HttpStatus.OK.value(),true,"",details);
@@ -57,9 +61,10 @@ public class CreateController {
     }
 
 
-    @PostMapping(value = "/student")
+    @PostMapping(value = STUDENT_URL)
     @PreAuthorize(ADMIN_ACCESS + " or " + STAFF_ACCESS)
-    public BaseResponse<StudentDetails> registerStudent(@RequestBody StudentDetails studentDetails) {
+    public BaseResponse<StudentDetails> registerStudent(@RequestBody StudentDetails studentDetails,@RequestHeader(AUTHORIZATION) String token) {
+        studentDetails.setCreatedBy(jwtTokenUtil.getUsernameFromToken(token.replace("Bearer ","")));
         StudentDetails details = createStudentService.save(studentDetails);
         if(Objects.nonNull(details)){
             return new BaseResponse<>(HttpStatus.CREATED.getReasonPhrase(), HttpStatus.OK.value(),true,"",details);

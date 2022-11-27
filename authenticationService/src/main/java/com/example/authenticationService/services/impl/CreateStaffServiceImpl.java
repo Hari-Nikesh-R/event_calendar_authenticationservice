@@ -55,7 +55,7 @@ public class CreateStaffServiceImpl implements RegisterService<StaffDetails>, Fe
     }
 
     @Override
-    public String changePassword(UpdatePassword updatePassword) {
+    public String changePassword(UpdatePassword updatePassword,Boolean isResetPassword) {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         StaffDetails staffDetails = getInfoById(updatePassword.getId());
         if(Objects.nonNull(staffDetails)) {
