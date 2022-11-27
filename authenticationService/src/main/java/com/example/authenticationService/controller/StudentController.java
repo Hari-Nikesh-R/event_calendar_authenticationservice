@@ -63,12 +63,27 @@ public class StudentController {
         HttpEntity<String> entity = setTokenInHeaders(token);
         Integer id = restTemplate.exchange(AUTHENTICATION_URL + "/student/fetch-id", HttpMethod.GET,entity,Integer.class).getBody();
         updatePassword.setId(id);
-        String isUpdated = studentDetailsFetchInfoService.changePassword(updatePassword);
+        String isUpdated = studentDetailsFetchInfoService.changePassword(updatePassword,false);
         if(Objects.nonNull(isUpdated))
         {
             return new BaseResponse<>("Updated", HttpStatus.OK.value(), true,"",isUpdated);
         }
         return new BaseResponse<>(HttpStatus.UPGRADE_REQUIRED.toString(), HttpStatus.UPGRADE_REQUIRED.value(), false,"Failed to update password",null);
+    }
+    @PutMapping(value = "/reset/password")
+    @PreAuthorize(ADMIN_ACCESS+" or "+STAFF_ACCESS)
+    public BaseResponse<String> resetStudentPassword(@RequestHeader("Authorization") String token){
+        HttpEntity<String> entity = setTokenInHeaders(token);
+        Integer id = restTemplate.exchange(AUTHENTICATION_URL+"/student/fetch-id",HttpMethod.GET,entity,Integer.class).getBody();
+        UpdatePassword updatePassword = new UpdatePassword();
+        updatePassword.setId(id);
+        String isUpdated = studentDetailsFetchInfoService.changePassword(updatePassword,true);
+        if(!isUpdated.startsWith("Failed"))
+        {
+            return new BaseResponse<>("Updated", HttpStatus.OK.value(), true,"",isUpdated);
+        }
+        return new BaseResponse<>(HttpStatus.UPGRADE_REQUIRED.toString(), HttpStatus.UPGRADE_REQUIRED.value(), false,"Failed to reset password",null);
+
     }
     private HttpEntity<String> setTokenInHeaders(String token){
         HttpHeaders httpHeaders = getHeaders();
@@ -81,5 +96,4 @@ public class StudentController {
         headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
         return headers;
     }
-
 }

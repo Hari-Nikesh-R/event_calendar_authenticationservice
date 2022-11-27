@@ -1,5 +1,6 @@
 package com.example.authenticationService.controller;
 
+import com.example.authenticationService.config.JwtTokenUtil;
 import com.example.authenticationService.dtos.BaseResponse;
 import com.example.authenticationService.model.AdminDetails;
 import com.example.authenticationService.model.StaffDetails;
@@ -27,6 +28,8 @@ public class CreateController {
     @Autowired
     RegisterService<StudentDetails> createStudentService;
 
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
     @PostMapping(value = "/admin")
     @PreAuthorize(ADMIN_ACCESS)
     public BaseResponse<AdminDetails> registerAdmin(@RequestBody AdminDetails adminDetails)
@@ -46,7 +49,8 @@ public class CreateController {
 
     @PostMapping(value = "/staff")
     @PreAuthorize(ADMIN_ACCESS)
-    public BaseResponse<StaffDetails> registerStaff(@RequestBody StaffDetails staffDetails){
+    public BaseResponse<StaffDetails> registerStaff(@RequestBody StaffDetails staffDetails,@RequestHeader("Authorization") String token){
+        staffDetails.setCreatedBy(jwtTokenUtil.getUsernameFromToken(token.replace("Bearer ","")));
         StaffDetails details = createStaffService.save(staffDetails);
         if(Objects.nonNull(details)){
             return new BaseResponse<>(HttpStatus.CREATED.getReasonPhrase(), HttpStatus.OK.value(),true,"",details);
@@ -59,7 +63,8 @@ public class CreateController {
 
     @PostMapping(value = "/student")
     @PreAuthorize(ADMIN_ACCESS + " or " + STAFF_ACCESS)
-    public BaseResponse<StudentDetails> registerStudent(@RequestBody StudentDetails studentDetails) {
+    public BaseResponse<StudentDetails> registerStudent(@RequestBody StudentDetails studentDetails,@RequestHeader("Authorization") String token) {
+        studentDetails.setCreatedBy(jwtTokenUtil.getUsernameFromToken(token.replace("Bearer ","")));
         StudentDetails details = createStudentService.save(studentDetails);
         if(Objects.nonNull(details)){
             return new BaseResponse<>(HttpStatus.CREATED.getReasonPhrase(), HttpStatus.OK.value(),true,"",details);

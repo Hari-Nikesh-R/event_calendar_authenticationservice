@@ -69,7 +69,7 @@ public class StaffController {
         HttpEntity<String> entity = setTokenInHeaders(token);
         Integer id = restTemplate.exchange(AUTHENTICATION_URL + "/staff/fetch-id", HttpMethod.GET,entity,Integer.class).getBody();
         updatePassword.setId(id);
-        String isUpdated = staffDetailsIntegerFetchInfoService.changePassword(updatePassword);
+        String isUpdated = staffDetailsIntegerFetchInfoService.changePassword(updatePassword,false);
         if(Objects.nonNull(isUpdated))
         {
             return new BaseResponse<>("Updated", HttpStatus.OK.value(), true,"",isUpdated);
