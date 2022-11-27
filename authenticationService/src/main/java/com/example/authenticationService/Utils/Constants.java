@@ -13,6 +13,7 @@ public interface Constants {
 
     String STUDENT_ACCESS = "hasAuthority('STUDENT')";
     String CLAIMS_ATTR = "claims";
+    String PASSWORD_VALIDATION = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,20}$";
     String SUB = "sub";
 
 

@@ -33,13 +33,18 @@ public class CreateController {
     public BaseResponse<AdminDetails> registerAdmin(@RequestBody AdminDetails adminDetails)
     {
         AdminDetails details=null;
-        if(Utility.validatePassword(adminDetails.getPassword())) {
+        boolean isValidPassword = Utility.validatePassword(adminDetails.getPassword());
+        if(isValidPassword) {
              details = createAdminService.save(adminDetails);
         }
             if (Objects.nonNull(details)){
                 return new BaseResponse<>(HttpStatus.CREATED.getReasonPhrase(), HttpStatus.OK.value(), true, "", details);
             }
         else {
+            if(!isValidPassword)
+            {
+                return new BaseResponse<>(HttpStatus.NOT_ACCEPTABLE.toString(), HttpStatus.NOT_ACCEPTABLE.value(), false,"Invalid Password",null);
+            }
                 return new BaseResponse<>(HttpStatus.ALREADY_REPORTED.getReasonPhrase(), HttpStatus.ALREADY_REPORTED.value(), false, "User Already Exist", null);
             }
 
@@ -51,14 +56,19 @@ public class CreateController {
     @PostMapping(value = "/staff")
     @PreAuthorize(ADMIN_ACCESS)
     public BaseResponse<StaffDetails> registerStaff(@RequestBody StaffDetails staffDetails){
-           StaffDetails details=null;
-        if(Utility.validatePassword(staffDetails.getPassword())){
+        StaffDetails details=null;
+        boolean isValidPassword = Utility.validatePassword(staffDetails.getPassword());
+        if(isValidPassword){
             details = createStaffService.save(staffDetails);
         }
         if(Objects.nonNull(details)){
             return new BaseResponse<>(HttpStatus.CREATED.getReasonPhrase(), HttpStatus.OK.value(),true,"",details);
         }
         else{
+            if(!isValidPassword)
+            {
+                return new BaseResponse<>(HttpStatus.NOT_ACCEPTABLE.toString(), HttpStatus.NOT_ACCEPTABLE.value(), false,"Invalid Password",null);
+            }
             return new BaseResponse<>(HttpStatus.ALREADY_REPORTED.getReasonPhrase(), HttpStatus.ALREADY_REPORTED.value(), false, "User Already Exist",null);
         }
     }
@@ -68,13 +78,19 @@ public class CreateController {
     @PreAuthorize(ADMIN_ACCESS + " or " + STAFF_ACCESS)
     public BaseResponse<StudentDetails> registerStudent(@RequestBody StudentDetails studentDetails) {
         StudentDetails details=null;
-        if(Utility.validatePassword(studentDetails.getPassword())) {
+        boolean isValidPassword = Utility.validatePassword(studentDetails.getPassword());
+        if(isValidPassword) {
              details = createStudentService.save(studentDetails);
         }
         if(Objects.nonNull(details)){
             return new BaseResponse<>(HttpStatus.CREATED.getReasonPhrase(), HttpStatus.OK.value(),true,"",details);
         }
         else{
+
+            if(!isValidPassword)
+            {
+                return new BaseResponse<>(HttpStatus.NOT_ACCEPTABLE.toString(), HttpStatus.NOT_ACCEPTABLE.value(), false,"Invalid Password",null);
+            }
             return new BaseResponse<>(HttpStatus.ALREADY_REPORTED.getReasonPhrase(), HttpStatus.ALREADY_REPORTED.value(), false, "User Already Exist",null);
         }
 
