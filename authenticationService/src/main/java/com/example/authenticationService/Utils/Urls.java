@@ -7,7 +7,6 @@ public interface Urls {
     String ADMIN_URL = "/admin";
     String STAFF_URL = "/staff";
     String STUDENT_URL = "/student";
-
     String FETCH_ID = "/fetch-id";
 
 
