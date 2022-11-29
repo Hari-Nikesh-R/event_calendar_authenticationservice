@@ -3,8 +3,7 @@ package com.example.authenticationService.Utils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.example.authenticationService.Utils.Constants.EMAIL_VALIDATION;
-import static com.example.authenticationService.Utils.Constants.PASSWORD_VALIDATION;
+import static com.example.authenticationService.Utils.Constants.*;
 
 public class Utility {
 
@@ -18,4 +17,12 @@ public class Utility {
     Matcher matcher=pattern.matcher(mailId);
     return  matcher.matches();
 }
+    public static boolean validateUsername(String userName)
+    {
+        if(userName.endsWith(USERNAME_SUFFICE))
+        {
+            return true;
+        }
+        return false;
+    }
 }

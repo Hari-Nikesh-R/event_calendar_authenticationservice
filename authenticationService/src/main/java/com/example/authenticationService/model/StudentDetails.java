@@ -13,6 +13,8 @@ public class StudentDetails{
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
+    private String collegeRollNumber;
+    private String username;
     private String email;
     private String firstName;
     private String lastName;
@@ -22,7 +24,6 @@ public class StudentDetails{
     private double CGPA;
     private String department;
     private String section;
-    private String collegeRollNumber;
     private String RegisterNumber;
     private String password;
     private String createdBy;

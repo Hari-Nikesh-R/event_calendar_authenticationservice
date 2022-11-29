@@ -24,7 +24,7 @@ public class CreateStudentServiceImpl implements RegisterService<StudentDetails>
 
     @Override
     public StudentDetails save(StudentDetails studentDetails) {
-        Optional<StudentDetails> optionalStudentDetails = userDetailsRepository.findByEmail(studentDetails.getEmail());
+        Optional<StudentDetails> optionalStudentDetails = userDetailsRepository.findByUsername(studentDetails.getUsername());
         if(optionalStudentDetails.isPresent())
         {
             return null;
@@ -47,8 +47,8 @@ public class CreateStudentServiceImpl implements RegisterService<StudentDetails>
     }
 
     @Override
-    public Integer getId(String email) {
-        Optional<Integer> optionalStudentId = userDetailsRepository.fetchId(email);
+    public Integer getId(String userName) {
+        Optional<Integer> optionalStudentId = userDetailsRepository.fetchId(userName);
         return optionalStudentId.orElse(null);
     }
 

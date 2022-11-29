@@ -7,4 +7,5 @@ public class UpdatePassword {
     private Integer id;
     private String email;
     private String password;
+    private String username;
 }

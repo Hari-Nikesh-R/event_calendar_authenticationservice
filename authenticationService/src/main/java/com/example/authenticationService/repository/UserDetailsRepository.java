@@ -11,13 +11,13 @@ import java.util.OptionalInt;
 
 @Repository
 public interface UserDetailsRepository extends CrudRepository<StudentDetails, String> {
-    Optional<StudentDetails> findByEmail(String userName);
+    Optional<StudentDetails> findByUsername(String username);
     List<StudentDetails> findAll();
 
     Optional<StudentDetails> findById(Integer id);
 
-    @Query(value = "select id from student_details where email = ?1",nativeQuery = true)
-    Optional<Integer> fetchId(String email);
+    @Query(value = "select id from student_details where user_name = ?1",nativeQuery = true)
+    Optional<Integer> fetchId(String userName);
 
 
 }

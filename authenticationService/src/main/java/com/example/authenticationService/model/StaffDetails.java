@@ -11,7 +11,6 @@ public class StaffDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
-
     private String firstName;
     private String lastName;
     private String email;

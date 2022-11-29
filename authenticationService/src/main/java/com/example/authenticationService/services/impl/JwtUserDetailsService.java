@@ -45,9 +45,9 @@ public class JwtUserDetailsService implements UserDetailsService {
         }
         switch (AUTHORITIES_KEY) {
             case STUDENT:
-                Optional<StudentDetails> userCred = userDetailsRepository.findByEmail(username);
+                Optional<StudentDetails> userCred = userDetailsRepository.findByUsername(username);
                 if (userCred.isPresent()) {
-                    if (userCred.get().getEmail().equals(username)) {
+                    if (userCred.get().getUsername().equals(username)) {
                         return new User(username, userCred.get().getPassword(), grantedAuthorityList);
                     }
                 }

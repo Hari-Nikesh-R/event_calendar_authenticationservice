@@ -82,7 +82,8 @@ public class CreateController {
     public BaseResponse<StudentDetails> registerStudent(@RequestBody StudentDetails studentDetails,@RequestHeader(AUTHORIZATION) String token) {
         studentDetails.setCreatedBy(jwtTokenUtil.getUsernameFromToken(token.replace("Bearer ","")));
         StudentDetails details=null;
-        if(Utility.validatePassword(studentDetails.getPassword()) && Utility.validateEmailId(studentDetails.getEmail())) {
+        studentDetails.setUsername(studentDetails.getCollegeRollNumber()+USERNAME_SUFFICE);
+        if(Utility.validatePassword(studentDetails.getPassword()) && Utility.validateUsername(studentDetails.getUsername())) {
             details = createStudentService.save(studentDetails);
         }
         else{
@@ -96,4 +97,5 @@ public class CreateController {
         }
 
     }
+
 }
