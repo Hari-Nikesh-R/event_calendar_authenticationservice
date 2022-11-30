@@ -2,11 +2,13 @@ package com.example.authenticationService.services.impl;
 
 import com.example.authenticationService.controller.StudentController;
 import com.example.authenticationService.dtos.UpdatePassword;
+import com.example.authenticationService.model.AdminDetails;
 import com.example.authenticationService.model.StaffDetails;
 import com.example.authenticationService.model.StudentDetails;
 import com.example.authenticationService.repository.UserDetailsRepository;
 import com.example.authenticationService.services.FetchInfoService;
 import com.example.authenticationService.services.RegisterService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -77,5 +79,16 @@ public class CreateStudentServiceImpl implements RegisterService<StudentDetails>
             }
         }
         return "Failed to Update password";
+    }
+
+    @Override
+    public StudentDetails updateProfile(StudentDetails details, Integer id) {
+        Optional<StudentDetails> optionalStudentDetails = userDetailsRepository.findById(id);
+        if(optionalStudentDetails.isPresent()) {
+            details.setId(optionalStudentDetails.get().getId());
+            BeanUtils.copyProperties(details, optionalStudentDetails.get());
+            return userDetailsRepository.save(optionalStudentDetails.get());
+        }
+        return null;
     }
 }

@@ -3,6 +3,7 @@ package com.example.authenticationService.controller;
 import com.example.authenticationService.config.JwtTokenUtil;
 import com.example.authenticationService.dtos.BaseResponse;
 import com.example.authenticationService.dtos.UpdatePassword;
+import com.example.authenticationService.model.AdminDetails;
 import com.example.authenticationService.model.StudentDetails;
 import com.example.authenticationService.services.FetchInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,9 +84,24 @@ public class StudentController {
         return new BaseResponse<>(HttpStatus.UPGRADE_REQUIRED.toString(), HttpStatus.UPGRADE_REQUIRED.value(), false,"Failed to reset password",null);
 
     }
+    @PutMapping(value = "/update/profile")
+    public BaseResponse<StudentDetails> updateAdminDetails(@RequestBody StudentDetails studentDetails, @RequestHeader(AUTHORIZATION) String token)
+    {
+        HttpEntity<String> entity = setTokenInHeaders(token);
+        Integer id = restTemplate.exchange(AUTHENTICATION_URL + "/student/fetch-id",HttpMethod.GET,entity,Integer.class).getBody();
+        StudentDetails updatedDetail = studentDetailsFetchInfoService.updateProfile(studentDetails,id);
+        if(Objects.nonNull(updatedDetail))
+        {
+            return new BaseResponse<>("Update Successful",HttpStatus.OK.value(),true,"",updatedDetail);
+        }
+        return new BaseResponse<>("Not Updated",HttpStatus.NON_AUTHORITATIVE_INFORMATION.value(), false,"updateDetails is null",null);
+
+
+    }
+
     private HttpEntity<String> setTokenInHeaders(String token){
         HttpHeaders httpHeaders = getHeaders();
-        httpHeaders.set("Authorization",token);
+        httpHeaders.set(AUTHORIZATION,token);
         return new HttpEntity<>(httpHeaders);
     }
     private HttpHeaders getHeaders() {

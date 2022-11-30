@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 import static com.example.authenticationService.Utils.Constants.*;
 
-public class Utility {
+public class Utility<T> {
 
     public static boolean validatePassword(String password) {
         Pattern pattern = Pattern.compile(PASSWORD_VALIDATION);

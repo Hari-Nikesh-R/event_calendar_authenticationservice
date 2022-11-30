@@ -1,11 +1,13 @@
 package com.example.authenticationService.services.impl;
 
 import com.example.authenticationService.dtos.UpdatePassword;
+import com.example.authenticationService.model.AdminDetails;
 import com.example.authenticationService.model.StaffDetails;
 import com.example.authenticationService.model.StudentDetails;
 import com.example.authenticationService.repository.StaffDetailsRepository;
 import com.example.authenticationService.services.FetchInfoService;
 import com.example.authenticationService.services.RegisterService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -64,5 +66,16 @@ public class CreateStaffServiceImpl implements RegisterService<StaffDetails>, Fe
             return "Password Updated Successfully";
         }
         return "Failed to Update password";
+    }
+
+    @Override
+    public StaffDetails updateProfile(StaffDetails details, Integer id) {
+        Optional<StaffDetails> optionalStaffDetails = staffDetailsInformation.findById(id);
+        if(optionalStaffDetails.isPresent()) {
+            details.setId(optionalStaffDetails.get().getId());
+            BeanUtils.copyProperties(details, optionalStaffDetails.get());
+            return staffDetailsInformation.save(optionalStaffDetails.get());
+        }
+        return null;
     }
 }

@@ -6,6 +6,7 @@ import com.example.authenticationService.model.StaffDetails;
 import com.example.authenticationService.repository.AdminDetailsRepository;
 import com.example.authenticationService.services.FetchInfoService;
 import com.example.authenticationService.services.RegisterService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -59,5 +60,16 @@ public class CreateAdminServiceImpl implements RegisterService<AdminDetails>, Fe
             return "Password Updated Successfully";
         }
         return "Failed to Update password";
+    }
+
+    @Override
+    public AdminDetails updateProfile(AdminDetails details, Integer id) {
+        Optional<AdminDetails> optionalAdminDetails = adminDetailsRepository.findById(id);
+        if(optionalAdminDetails.isPresent()) {
+            details.setId(optionalAdminDetails.get().getId());
+            BeanUtils.copyProperties(details, optionalAdminDetails.get());
+            return adminDetailsRepository.save(optionalAdminDetails.get());
+        }
+        return null;
     }
 }

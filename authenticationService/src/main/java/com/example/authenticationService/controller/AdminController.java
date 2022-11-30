@@ -1,5 +1,6 @@
 package com.example.authenticationService.controller;
 
+import com.example.authenticationService.Utils.Constants;
 import com.example.authenticationService.config.JwtTokenUtil;
 import com.example.authenticationService.dtos.BaseResponse;
 import com.example.authenticationService.dtos.UpdatePassword;
@@ -64,9 +65,25 @@ public class AdminController {
         }
         return new BaseResponse<>(HttpStatus.UPGRADE_REQUIRED.toString(), HttpStatus.UPGRADE_REQUIRED.value(), false,"Failed to update password",null);
     }
+
+    @PutMapping(value = "/update/profile")
+    public BaseResponse<AdminDetails> updateAdminDetails(@RequestBody AdminDetails adminDetails, @RequestHeader(AUTHORIZATION) String token)
+    {
+        HttpEntity<String> entity = setTokenInHeaders(token);
+        Integer id = restTemplate.exchange(AUTHENTICATION_URL + "/admin/fetch-id",HttpMethod.GET,entity,Integer.class).getBody();
+        AdminDetails updatedDetail = adminDetailsIntegerFetchInfoService.updateProfile(adminDetails,id);
+        if(Objects.nonNull(updatedDetail))
+        {
+            return new BaseResponse<>("Update Successful",HttpStatus.OK.value(),true,"",updatedDetail);
+        }
+        return new BaseResponse<>("Not Updated",HttpStatus.NON_AUTHORITATIVE_INFORMATION.value(), false,"updateDetails is null",null);
+
+
+    }
+
     private HttpEntity<String> setTokenInHeaders(String token){
         HttpHeaders httpHeaders = getHeaders();
-        httpHeaders.set("Authorization",token);
+        httpHeaders.set(AUTHORIZATION,token);
         return new HttpEntity<>(httpHeaders);
     }
     private HttpHeaders getHeaders() {

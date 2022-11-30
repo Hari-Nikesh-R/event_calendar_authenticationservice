@@ -75,6 +75,20 @@ public class StaffController {
         }
         return new BaseResponse<>(HttpStatus.UPGRADE_REQUIRED.toString(), HttpStatus.UPGRADE_REQUIRED.value(), false,"Failed to update password",null);
     }
+    @PutMapping(value = "/update/profile")
+    public BaseResponse<StaffDetails> updateAdminDetails(@RequestBody StaffDetails staffDetails, @RequestHeader(AUTHORIZATION) String token)
+    {
+        HttpEntity<String> entity = setTokenInHeaders(token);
+        Integer id = restTemplate.exchange(AUTHENTICATION_URL + "/staff/fetch-id",HttpMethod.GET,entity,Integer.class).getBody();
+        StaffDetails updatedDetail = staffDetailsIntegerFetchInfoService.updateProfile(staffDetails,id);
+        if(Objects.nonNull(updatedDetail))
+        {
+            return new BaseResponse<>("Update Successful",HttpStatus.OK.value(),true,"",updatedDetail);
+        }
+        return new BaseResponse<>("Not Updated",HttpStatus.NON_AUTHORITATIVE_INFORMATION.value(), false,"updateDetails is null",null);
+
+
+    }
 
     private HttpEntity<String> setTokenInHeaders(String token){
         HttpHeaders httpHeaders = getHeaders();
