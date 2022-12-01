@@ -21,6 +21,10 @@ public interface Constants {
     String OR = " or ";
     String EMAIL_VALIDATION="^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
     String USERNAME_SUFFICE = "@sece";
+    String UPDATE_PASSWORD = "Password Updated Successfully";
+    String UPDATE_PASSWORD_FAILED = "Failed to Update password";
+    String RESET_SUCCESSFUL = "Password Reset Successful";
+
 
 
 }

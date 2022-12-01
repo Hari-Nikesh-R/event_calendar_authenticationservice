@@ -86,8 +86,6 @@ public class StaffController {
             return new BaseResponse<>("Update Successful",HttpStatus.OK.value(),true,"",updatedDetail);
         }
         return new BaseResponse<>("Not Updated",HttpStatus.NON_AUTHORITATIVE_INFORMATION.value(), false,"updateDetails is null",null);
-
-
     }
 
     private HttpEntity<String> setTokenInHeaders(String token){

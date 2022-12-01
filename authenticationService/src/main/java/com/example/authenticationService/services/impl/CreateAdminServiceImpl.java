@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static com.example.authenticationService.Utils.Constants.UPDATE_PASSWORD;
+import static com.example.authenticationService.Utils.Constants.UPDATE_PASSWORD_FAILED;
+
 @Service
 public class CreateAdminServiceImpl implements RegisterService<AdminDetails>, FetchInfoService<AdminDetails,Integer> {
     @Autowired
@@ -57,9 +60,9 @@ public class CreateAdminServiceImpl implements RegisterService<AdminDetails>, Fe
         if(Objects.nonNull(adminDetails)) {
             adminDetails.setPassword(bCryptPasswordEncoder.encode(updatePassword.getPassword()));
             adminDetailsRepository.save(adminDetails);
-            return "Password Updated Successfully";
+            return UPDATE_PASSWORD;
         }
-        return "Failed to Update password";
+        return UPDATE_PASSWORD_FAILED;
     }
 
     @Override

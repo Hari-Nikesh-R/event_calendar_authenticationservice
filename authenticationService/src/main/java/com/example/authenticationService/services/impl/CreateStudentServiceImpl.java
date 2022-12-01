@@ -18,6 +18,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static com.example.authenticationService.Utils.Constants.*;
+
 @Service
 public class CreateStudentServiceImpl implements RegisterService<StudentDetails>, FetchInfoService<StudentDetails,Integer> {
 
@@ -70,15 +72,15 @@ public class CreateStudentServiceImpl implements RegisterService<StudentDetails>
             if(isResetPassword){
                 studentDetails.setPassword(bCryptPasswordEncoder.encode("Student@123"));
                 userDetailsRepository.save(studentDetails);
-                return "Password Reset Successful";
+                return RESET_SUCCESSFUL;
             }
             else {
                 studentDetails.setPassword(bCryptPasswordEncoder.encode(updatePassword.getPassword()));
                 userDetailsRepository.save(studentDetails);
-                return "Password Updated Successfully";
+                return UPDATE_PASSWORD;
             }
         }
-        return "Failed to Update password";
+        return UPDATE_PASSWORD_FAILED;
     }
 
     @Override
