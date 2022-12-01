@@ -1,6 +1,7 @@
 package com.example.authenticationService.controller;
 
 import com.example.authenticationService.config.JwtTokenUtil;
+import com.example.authenticationService.dtos.BaseResponse;
 import com.example.authenticationService.dtos.JwtRequest;
 import com.example.authenticationService.dtos.JwtResponse;
 import com.example.authenticationService.services.impl.JwtUserDetailsService;
@@ -16,11 +17,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.example.authenticationService.Utils.Configuration.AUTHORITIES_KEY;
-import static com.example.authenticationService.Utils.Constants.CLAIMS_ATTR;
-import static com.example.authenticationService.Utils.Constants.SUB;
+import static com.example.authenticationService.Utils.Constants.*;
 import static com.example.authenticationService.Utils.Urls.LOGIN;
 import static com.example.authenticationService.Utils.Urls.REFRESH_TOKEN;
 
@@ -69,6 +70,12 @@ public class AuthController {
         String token = jwtTokenUtil.doGenerateRefreshToken(expectedMap, expectedMap.get(SUB).toString());
         return ResponseEntity.ok(new JwtResponse(token));
     }
+
+    //todo: Fetch Requested Password.
+//    @GetMapping(value = "/requested-password")
+//    public BaseResponse<List<?>> getRequestedPassword(@RequestHeader(AUTHORIZATION) String token){
+//
+//    }
 
     public Map<String, Object> getMapFromIoJsonwebtokenClaims(DefaultClaims claims) {
         Map<String, Object> expectedMap = new HashMap<>();

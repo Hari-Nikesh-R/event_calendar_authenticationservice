@@ -44,7 +44,7 @@ public class AdminController {
     }
 
     @GetMapping(value = FETCH_ID)
-    public Integer getAdminId(@RequestHeader(AUTHORIZATION) String token){
+    public synchronized Integer getAdminId(@RequestHeader(AUTHORIZATION) String token){
         token = token.replace("Bearer ","");
         String email =jwtTokenUtil.getUsernameFromToken(token);
         Integer adminInfoId = adminDetailsIntegerFetchInfoService.getId(email);
@@ -80,6 +80,19 @@ public class AdminController {
 
 
     }
+
+    @PostMapping(value = "/forgot-password/{emailId}")
+    public BaseResponse<String> forgetPassword(@PathVariable("emailId") String email,@RequestHeader(AUTHORIZATION) String token)
+    {
+        HttpEntity<String> entity = setTokenInHeaders(token);
+        Integer id = restTemplate.exchange(AUTHENTICATION_URL + "/admin/fetch-id",HttpMethod.GET,entity,Integer.class).getBody();
+        if(Objects.nonNull(adminDetailsIntegerFetchInfoService.getInfoById(id)))
+        {
+            //todo: Send email via Email Service.
+        }
+        return new BaseResponse<>("Invalid email",HttpStatus.NOT_ACCEPTABLE.value(),false,"No Admin Found",null);
+    }
+
 
     private HttpEntity<String> setTokenInHeaders(String token){
         HttpHeaders httpHeaders = getHeaders();

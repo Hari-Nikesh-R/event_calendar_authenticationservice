@@ -87,6 +87,23 @@ public class StaffController {
         }
         return new BaseResponse<>("Not Updated",HttpStatus.NON_AUTHORITATIVE_INFORMATION.value(), false,"updateDetails is null",null);
     }
+    @PostMapping(value = "/forgot-password/{emailId}/{flag}")
+    public BaseResponse<String> forgetPassword(@PathVariable("emailId") String email,@RequestHeader(AUTHORIZATION) String token,@PathVariable("flag") Integer isAdminRequest)
+    {
+        HttpEntity<String> entity = setTokenInHeaders(token);
+        Integer id = restTemplate.exchange(AUTHENTICATION_URL + "/staff/fetch-id",HttpMethod.GET,entity,Integer.class).getBody();
+        if(Objects.nonNull(staffDetailsIntegerFetchInfoService.getInfoById(id)))
+        {
+            if(isAdminRequest == 1) {
+                //todo: Request Admin for password reset.
+            }
+            else{
+                //todo: Send email via Email Service.
+            }
+
+        }
+        return new BaseResponse<>("Invalid email",HttpStatus.NOT_ACCEPTABLE.value(),false,"No Staff Found",null);
+    }
 
     private HttpEntity<String> setTokenInHeaders(String token){
         HttpHeaders httpHeaders = getHeaders();

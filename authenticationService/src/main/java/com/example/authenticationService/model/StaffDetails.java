@@ -21,5 +21,6 @@ public class StaffDetails {
     private String designation;
     private String password;
     private String createdBy;
+    private String updatedBy;
     private String role = "STAFF";
 }

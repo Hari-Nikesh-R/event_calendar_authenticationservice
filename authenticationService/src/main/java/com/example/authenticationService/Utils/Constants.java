@@ -25,6 +25,4 @@ public interface Constants {
     String UPDATE_PASSWORD_FAILED = "Failed to Update password";
     String RESET_SUCCESSFUL = "Password Reset Successful";
 
-
-
 }

@@ -3,8 +3,10 @@ package com.example.authenticationService.services.impl;
 import com.example.authenticationService.controller.StudentController;
 import com.example.authenticationService.dtos.UpdatePassword;
 import com.example.authenticationService.model.AdminDetails;
+import com.example.authenticationService.model.ResetPasswordRequest;
 import com.example.authenticationService.model.StaffDetails;
 import com.example.authenticationService.model.StudentDetails;
+import com.example.authenticationService.repository.ResetPasswordRepository;
 import com.example.authenticationService.repository.UserDetailsRepository;
 import com.example.authenticationService.services.FetchInfoService;
 import com.example.authenticationService.services.RegisterService;
@@ -93,4 +95,5 @@ public class CreateStudentServiceImpl implements RegisterService<StudentDetails>
         }
         return null;
     }
+
 }

@@ -95,8 +95,16 @@ public class StudentController {
             return new BaseResponse<>("Update Successful",HttpStatus.OK.value(),true,"",updatedDetail);
         }
         return new BaseResponse<>("Not Updated",HttpStatus.NON_AUTHORITATIVE_INFORMATION.value(), false,"updateDetails is null",null);
-
-
+    }
+    @PostMapping(value = "/forgot-password")
+    public BaseResponse<String> forgetPassword(@RequestHeader(AUTHORIZATION) String token)
+    {
+        HttpEntity<String> entity = setTokenInHeaders(token);
+        Integer id = restTemplate.exchange(AUTHENTICATION_URL + "/student/fetch-id",HttpMethod.GET,entity,Integer.class).getBody();
+        if(Objects.nonNull(studentDetailsFetchInfoService.getInfoById(id))) {
+                //todo: Request Admin for password reset.
+        }
+        return new BaseResponse<>("Invalid email",HttpStatus.NOT_ACCEPTABLE.value(),false,"No Student Found",null);
     }
 
     private HttpEntity<String> setTokenInHeaders(String token){
