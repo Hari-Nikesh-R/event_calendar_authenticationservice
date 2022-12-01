@@ -11,6 +11,7 @@ public class AdminDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
+    private String profilePicture;
     private String email;
     private String firstName;
     private String lastName;
