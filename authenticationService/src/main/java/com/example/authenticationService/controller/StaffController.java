@@ -5,6 +5,7 @@ import com.example.authenticationService.dtos.BaseResponse;
 import com.example.authenticationService.dtos.UpdatePassword;
 import com.example.authenticationService.model.StaffDetails;
 import com.example.authenticationService.services.FetchInfoService;
+import com.example.authenticationService.services.StaffService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,6 +26,8 @@ public class StaffController {
 
     @Autowired
     FetchInfoService<StaffDetails,Integer> staffDetailsIntegerFetchInfoService;
+    @Autowired
+    StaffService staffService;
     @Autowired
     JwtTokenUtil jwtTokenUtil;
 
@@ -86,6 +89,35 @@ public class StaffController {
             return new BaseResponse<>("Update Successful",HttpStatus.OK.value(),true,"",updatedDetail);
         }
         return new BaseResponse<>("Not Updated",HttpStatus.NON_AUTHORITATIVE_INFORMATION.value(), false,"updateDetails is null",null);
+    }
+    @PostMapping(value = "/forgot-password/{emailId}/{flag}")
+    public BaseResponse<String> forgetPassword(@PathVariable("emailId") String email,@RequestHeader(AUTHORIZATION) String token,@PathVariable("flag") Integer isAdminRequest)
+    {
+        HttpEntity<String> entity = setTokenInHeaders(token);
+        Integer id = restTemplate.exchange(AUTHENTICATION_URL + "/staff/fetch-id",HttpMethod.GET,entity,Integer.class).getBody();
+        if(id!=-1)
+        {
+            if(isAdminRequest == 1) {
+                //todo: Request Admin for password reset.
+            }
+            else{
+                //todo: Send email via Email Service.
+                staffService.resetPassword(id);
+            }
+
+        }
+        return new BaseResponse<>("Invalid email",HttpStatus.NOT_ACCEPTABLE.value(),false,"No Staff Found",null);
+    }
+    @PostMapping(value = "/verify/{code}")
+    public BaseResponse<String> verifyCode(@PathVariable("code") String code,@RequestHeader(AUTHORIZATION) String token)
+    {
+        HttpEntity<String> entity = setTokenInHeaders(token);
+        Integer id = restTemplate.exchange(AUTHENTICATION_URL+"/staff/fetch-id",HttpMethod.GET,entity,Integer.class).getBody();
+        if(id==-1)
+        {
+            return new BaseResponse<>("User Not Found",HttpStatus.NO_CONTENT.value(), false,"Could not find Id",null);
+        }
+        return staffService.verifyCode(id,code);
     }
 
     private HttpEntity<String> setTokenInHeaders(String token){

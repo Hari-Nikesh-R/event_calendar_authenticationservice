@@ -11,6 +11,7 @@ public class StaffDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
+    private String profilePicture;
     private String firstName;
     private String lastName;
     private String email;
@@ -21,5 +22,6 @@ public class StaffDetails {
     private String designation;
     private String password;
     private String createdBy;
+    private String passwordUpdatedBy;
     private String role = "STAFF";
 }

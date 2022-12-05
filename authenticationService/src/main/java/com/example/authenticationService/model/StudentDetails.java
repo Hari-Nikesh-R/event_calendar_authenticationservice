@@ -13,6 +13,7 @@ public class StudentDetails{
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
+    private String profilePicture;
     private String collegeRollNumber;
     private String username;
     private String email;
@@ -22,12 +23,14 @@ public class StudentDetails{
     private String phoneNumber;
     private String alterPhoneNumber;
     private double CGPA;
+    private double SSLCMark;
+    private double HSCMark;
     private String department;
     private String section;
     private String RegisterNumber;
     private String password;
     private String createdBy;
+    private String passwordUpdatedBy;
     private String role = "STUDENT";
     private String academicYear;
-
 }

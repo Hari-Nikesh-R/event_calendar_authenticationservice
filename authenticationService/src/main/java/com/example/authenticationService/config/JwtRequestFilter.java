@@ -7,6 +7,10 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -26,6 +31,9 @@ import java.util.Date;
 import java.util.List;
 
 import static com.example.authenticationService.Utils.Configuration.AUTHORITIES_KEY;
+import static com.example.authenticationService.Utils.Constants.AUTHORIZATION;
+import static com.example.authenticationService.Utils.Urls.AUTHENTICATION_URL;
+import static com.example.authenticationService.Utils.Urls.REFRESH_TOKEN;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -56,8 +64,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                     allowForRefreshToken(e, request);
                 } else
                     request.setAttribute("exception", e);
-
-                System.out.println("JWT Token has expired");
+                 System.out.println("JWT Token has expired");
             }
         } else {
             logger.warn("JWT Token does not begin with Bearer String");
@@ -93,4 +100,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         request.setAttribute("claims", ex.getClaims());
 
     }
+
+
 }
