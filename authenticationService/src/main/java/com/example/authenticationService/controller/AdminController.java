@@ -5,7 +5,9 @@ import com.example.authenticationService.config.JwtTokenUtil;
 import com.example.authenticationService.dtos.BaseResponse;
 import com.example.authenticationService.dtos.UpdatePassword;
 import com.example.authenticationService.model.AdminDetails;
+import com.example.authenticationService.services.AdminService;
 import com.example.authenticationService.services.FetchInfoService;
+import com.example.authenticationService.services.RegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,8 +16,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Objects;
 
-import static com.example.authenticationService.Utils.Constants.ADMIN_ACCESS;
-import static com.example.authenticationService.Utils.Constants.AUTHORIZATION;
+import static com.example.authenticationService.Utils.Constants.*;
 import static com.example.authenticationService.Utils.Urls.*;
 
 
@@ -26,6 +27,8 @@ public class AdminController {
 
     @Autowired
     FetchInfoService<AdminDetails,Integer> adminDetailsIntegerFetchInfoService;
+    @Autowired
+    AdminService adminService;
 
     @Autowired
     RestTemplate restTemplate;
@@ -88,9 +91,21 @@ public class AdminController {
         Integer id = restTemplate.exchange(AUTHENTICATION_URL + "/admin/fetch-id",HttpMethod.GET,entity,Integer.class).getBody();
         if(Objects.nonNull(adminDetailsIntegerFetchInfoService.getInfoById(id)))
         {
-            //todo: Send email via Email Service.
+             return adminService.resetPassword(id);
         }
         return new BaseResponse<>("Invalid email",HttpStatus.NOT_ACCEPTABLE.value(),false,"No Admin Found",null);
+    }
+
+    @PostMapping(value = "/verify/{code}")
+    public BaseResponse<String> verifyCode(@PathVariable("code") String code,@RequestHeader(AUTHORIZATION) String token)
+    {
+        HttpEntity<String> entity = setTokenInHeaders(token);
+        Integer id = restTemplate.exchange(AUTHENTICATION_URL+"/admin/fetch-id",HttpMethod.GET,entity,Integer.class).getBody();
+        if(id==-1)
+        {
+            return new BaseResponse<>("User Not Found",HttpStatus.NO_CONTENT.value(), false,"Could not find Id",null);
+        }
+        return adminService.verifyCode(id,code);
     }
 
 

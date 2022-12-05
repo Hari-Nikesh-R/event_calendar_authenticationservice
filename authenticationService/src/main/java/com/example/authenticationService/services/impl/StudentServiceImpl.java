@@ -1,15 +1,11 @@
 package com.example.authenticationService.services.impl;
 
-import com.example.authenticationService.controller.StudentController;
 import com.example.authenticationService.dtos.UpdatePassword;
-import com.example.authenticationService.model.AdminDetails;
-import com.example.authenticationService.model.ResetPasswordRequest;
-import com.example.authenticationService.model.StaffDetails;
 import com.example.authenticationService.model.StudentDetails;
-import com.example.authenticationService.repository.ResetPasswordRepository;
 import com.example.authenticationService.repository.UserDetailsRepository;
 import com.example.authenticationService.services.FetchInfoService;
 import com.example.authenticationService.services.RegisterService;
+import com.example.authenticationService.services.StudentService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,12 +14,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static com.example.authenticationService.Utils.Constants.*;
 
 @Service
-public class CreateStudentServiceImpl implements RegisterService<StudentDetails>, FetchInfoService<StudentDetails,Integer> {
+public class StudentServiceImpl implements RegisterService<StudentDetails>, FetchInfoService<StudentDetails,Integer>, StudentService {
 
     @Autowired
     UserDetailsRepository userDetailsRepository;
