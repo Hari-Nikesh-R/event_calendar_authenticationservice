@@ -1,7 +1,6 @@
 package com.example.authenticationService.repository;
 
 import com.example.authenticationService.model.AdminDetails;
-import com.example.authenticationService.model.StudentDetails;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

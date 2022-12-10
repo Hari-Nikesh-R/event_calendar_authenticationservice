@@ -11,12 +11,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.example.authenticationService.Utils.Configuration.AUTHORITIES_KEY;
 
 @Component
 public class JwtTokenUtil implements Serializable {
@@ -60,12 +60,6 @@ public class JwtTokenUtil implements Serializable {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
     }
 
-    public String getRoleFromToken(String token)
-    {
-        Claims claims = getAllClaimsFromToken(token);
-        return (String) claims.get("roles");
-    }
-
     //check if the token has expired
     private Boolean isTokenExpired(String token) {
         final Date expiration = getExpirationDateFromToken(token);
@@ -82,7 +76,7 @@ public class JwtTokenUtil implements Serializable {
 
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + refreshExpirationDateInMs))
-                .signWith(SignatureAlgorithm.HS384, secret).compact();
+                .signWith(SignatureAlgorithm.HS256, secret).compact();
 
     }
 
@@ -95,7 +89,7 @@ public class JwtTokenUtil implements Serializable {
 //        return Jwts.builder().setClaims().setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis())).setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000)).signWith(SignatureAlgorithm.HS384, secret).compact();
 //    }
     private String doGenerateToken(Map<String, Object> claims, String subject) {
-        return Jwts.builder().setSubject(subject).claim("roles",AUTHORITIES_KEY).setIssuedAt(new Date(System.currentTimeMillis())).setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000)).signWith(SignatureAlgorithm.HS384, secret).compact();
+        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis())).setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000)).signWith(SignatureAlgorithm.HS256, secret).compact();
     }
 
     //validate token
@@ -104,20 +98,20 @@ public class JwtTokenUtil implements Serializable {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-     UsernamePasswordAuthenticationToken getAuthentication(final String token, final Authentication existingAuth, final UserDetails userDetails) {
-
-        final JwtParser jwtParser = Jwts.parser().setSigningKey(secret);
-
-        final Jws claimsJws = jwtParser.parseClaimsJws(token);
-
-        final Claims claims = (Claims) claimsJws.getBody();
-
-        final Collection authorities =
-                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
-
-        return new UsernamePasswordAuthenticationToken(userDetails, "", authorities);
-    }
+//     UsernamePasswordAuthenticationToken getAuthentication(final String token, final Authentication existingAuth, final UserDetails userDetails) {
+//
+//        final JwtParser jwtParser = Jwts.parser().setSigningKey(secret);
+//
+//        final Jws claimsJws = jwtParser.parseClaimsJws(token);
+//
+//        final Claims claims = (Claims) claimsJws.getBody();
+//
+////        final Collection authorities =
+////                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
+////                        .map(SimpleGrantedAuthority::new)
+////                        .collect(Collectors.toList());
+//
+//        return new UsernamePasswordAuthenticationToken(userDetails, "", authorities);
+//    }
 
 }

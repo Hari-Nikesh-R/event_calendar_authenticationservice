@@ -20,15 +20,6 @@ public class Utility implements GenerateResetPassCode{
     Matcher matcher=pattern.matcher(mailId);
     return  matcher.matches();
 }
-    public static boolean validateUsername(String userName)
-    {
-        if(userName.endsWith(USERNAME_SUFFICE))
-        {
-            return true;
-        }
-        return false;
-    }
-
     @Override
     public String generateCode() {
         Random random = new Random();

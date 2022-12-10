@@ -19,5 +19,5 @@ public class AdminDetails {
     private String phoneNumber;
     private String password;
     private String organizationalAddress;
-    private String role = "ADMIN";
+    private boolean authority;
 }

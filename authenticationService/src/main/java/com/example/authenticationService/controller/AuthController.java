@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.example.authenticationService.Utils.Configuration.AUTHORITIES_KEY;
 import static com.example.authenticationService.Utils.Constants.*;
 import static com.example.authenticationService.Utils.Urls.LOGIN;
 import static com.example.authenticationService.Utils.Urls.REFRESH_TOKEN;
@@ -43,7 +42,6 @@ public class AuthController {
     @RequestMapping(value = LOGIN, method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
 
-        AUTHORITIES_KEY = authenticationRequest.getRoles();
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         final UserDetails userDetails = userDetailsService
                 .loadUserByUsername(authenticationRequest.getUsername());

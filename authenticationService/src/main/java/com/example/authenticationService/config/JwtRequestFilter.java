@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static com.example.authenticationService.Utils.Configuration.AUTHORITIES_KEY;
 import static com.example.authenticationService.Utils.Constants.AUTHORIZATION;
 import static com.example.authenticationService.Utils.Urls.AUTHENTICATION_URL;
 import static com.example.authenticationService.Utils.Urls.REFRESH_TOKEN;
@@ -46,7 +45,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestTokenHeader = request.getHeader("Authorization");
-
         String username = null;
         String jwtToken = null;
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
@@ -68,9 +66,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
         } else {
             logger.warn("JWT Token does not begin with Bearer String");
-        }
-        if(jwtToken!=null && !"true".equals(request.getHeader("isRefreshToken"))) {
-            AUTHORITIES_KEY = jwtTokenUtil.getRoleFromToken(jwtToken);
         }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
