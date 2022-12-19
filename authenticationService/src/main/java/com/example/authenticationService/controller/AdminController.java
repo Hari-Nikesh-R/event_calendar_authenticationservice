@@ -22,7 +22,6 @@ import static com.example.authenticationService.Utils.Urls.*;
 
 @RestController
 @RequestMapping(ADMIN_URL)
-@PreAuthorize(ADMIN_ACCESS)
 public class AdminController {
 
     @Autowired
@@ -91,7 +90,7 @@ public class AdminController {
         Integer id = restTemplate.exchange(AUTHENTICATION_URL + "/admin/fetch-id",HttpMethod.GET,entity,Integer.class).getBody();
         if(Objects.nonNull(adminDetailsIntegerFetchInfoService.getInfoById(id)))
         {
-             return adminService.resetPassword(id);
+             return adminService.sendCodeToMail(id,true);
         }
         return new BaseResponse<>("Invalid email",HttpStatus.NOT_ACCEPTABLE.value(),false,"No Admin Found",null);
     }
@@ -103,7 +102,7 @@ public class AdminController {
         Integer id = restTemplate.exchange(AUTHENTICATION_URL+"/admin/fetch-id",HttpMethod.GET,entity,Integer.class).getBody();
         if(id==-1)
         {
-            return new BaseResponse<>("User Not Found",HttpStatus.NO_CONTENT.value(), false,"Could not find Id",null);
+            return new BaseResponse<>("User Not Found", HttpStatus.NO_CONTENT.value(), false,"Could not find Id",null);
         }
         return adminService.verifyCode(id,code);
     }

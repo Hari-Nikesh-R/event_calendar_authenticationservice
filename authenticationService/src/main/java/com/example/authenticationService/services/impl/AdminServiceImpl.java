@@ -17,11 +17,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.example.authenticationService.Utils.Constants.UPDATE_PASSWORD;
-import static com.example.authenticationService.Utils.Constants.UPDATE_PASSWORD_FAILED;
+import static com.example.authenticationService.Utils.Constants.*;
 import static com.example.authenticationService.Utils.Urls.MAIL_URL;
 
 @Service
@@ -49,18 +49,34 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
     }
 
     @Override
-    public BaseResponse<String> resetPassword(Integer id) {
-        Optional<AdminDetails> optionalAdminDetails = adminDetailsRepository.findById(id);
+    public BaseResponse<String> sendCodeToMail(Integer id,boolean isForgotPassword) {
+        String response = "";
         EmailDetails emailDetails = new EmailDetails();
-        if(optionalAdminDetails.isPresent()) {
-            generatedCode = generateResetPassCode.generateCode();
-            emailDetails.setCode(generatedCode);
-            emailDetails.setRecipient(optionalAdminDetails.get().getEmail());
-            emailDetails.setMsgBody("You code for Reset Password: " + emailDetails.getCode());
-            emailDetails.setSubject("LEAVE TRACKER - Reset Password");
+        boolean hasRights=false;
+        if(id==-2) {
+            hasRights = true;
+            emailDetails.setRecipient(DEFAULT_USER);
         }
-        String response = restTemplate.postForEntity(MAIL_URL + "/passcode", emailDetails, String.class).getBody();
-        return new BaseResponse<>("", HttpStatus.OK.value(), true,"",response);
+        else {
+            Optional<AdminDetails> optionalAdminDetails = adminDetailsRepository.findById(id);
+            if (optionalAdminDetails.isPresent()) {
+                hasRights = optionalAdminDetails.get().isAuthority();
+                emailDetails.setRecipient(optionalAdminDetails.get().getEmail());
+            }
+        }
+        generatedCode = generateResetPassCode.generateCode();
+        emailDetails.setCode(generatedCode);
+        if (isForgotPassword) {
+            emailDetails.setMsgBody("Your code for Reset Password: " + emailDetails.getCode());
+            emailDetails.setSubject("SECE CAREER QUEST - Reset Password");
+        } else {
+            emailDetails.setMsgBody("Your code for Registering user: " + emailDetails.getCode());
+            emailDetails.setSubject("SECE CAREER QUEST - Register User");
+        }
+        if (isForgotPassword || hasRights) {
+            response = restTemplate.postForEntity(MAIL_URL + "/passcode", emailDetails, String.class).getBody();
+        }
+        return new BaseResponse<>("", HttpStatus.OK.value(), true, "", response);
     }
 
     @Override
@@ -70,16 +86,26 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
        {
            if(code!=null) {
                if (code.equals(generatedCode)) {
-                   return new BaseResponse<>("Code verified", HttpStatus.OK.value(), true, "", "Success");
+                       return new BaseResponse<>("Code verified", HttpStatus.OK.value(), true, "", "Success");
+                   }
                }
            }
-       }
        return new BaseResponse<>("Code not verified",HttpStatus.FORBIDDEN.value(), false,"","Not Verified");
-
-
     }
-
-
+    @Override
+    public BaseResponse<String> verifyCode(Integer id, String code,AdminDetails adminDetails) {
+        Optional<AdminDetails> optionalAdminDetails =  adminDetailsRepository.findById(id);
+        if(optionalAdminDetails.isPresent())
+        {
+            if(code!=null) {
+                if (code.equals(generatedCode)) {
+                    save(adminDetails);
+                    return new BaseResponse<>("Code verified and Registered successful", HttpStatus.OK.value(), true, "", "Success");
+                }
+            }
+        }
+        return new BaseResponse<>("Code not verified",HttpStatus.FORBIDDEN.value(), false,"","Not Verified");
+    }
     @Override
     public List<AdminDetails> getAllInfo() {
         return adminDetailsRepository.findAll();
