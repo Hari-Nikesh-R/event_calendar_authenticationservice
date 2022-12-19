@@ -4,8 +4,8 @@ package com.example.authenticationService.Utils;
 public interface Constants {
     String USER_NOT_FOUND = "User not found with username: ";
     String ADMIN = "ADMIN";
-    String DEFAULT_USER = "placements@sece.ac.in";
-    String DEFAULT_PASSWORD = "passwor";
+    String DEFAULT_USER = "hari.nikesh.r.cce@gmail.com";
+    String DEFAULT_PASSWORD = "password";
     String ADMIN_ACCESS = "hasAuthority('ADMIN')";
     String AUTHORIZATION = "Authorization";
     String CLAIMS_ATTR = "claims";
