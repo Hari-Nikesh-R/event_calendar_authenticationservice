@@ -59,15 +59,14 @@ public class CreateController {
     {
         HttpEntity<String> entity = setTokenInHeaders(token);
         Integer id = restTemplate.exchange(AUTHENTICATION_URL+"/admin/fetch-id",HttpMethod.GET,entity,Integer.class).getBody();
-        if(id==-1)
-        {
+        if(id==-1) {
             return new BaseResponse<>("User Not Found", HttpStatus.NO_CONTENT.value(), false,"Could not find Id",null);
         }
-        return adminService.verifyCode(id,code);
+        return adminService.verifyCode(id,code,adminDetails);
     }
 
-    @PostMapping(value = "/{emailId}")
-    public BaseResponse<String> register(@PathVariable("emailId") String email,@RequestHeader(AUTHORIZATION) String token)
+    @PostMapping
+    public BaseResponse<String> register(@RequestHeader(AUTHORIZATION) String token)
     {
         HttpEntity<String> entity = setTokenInHeaders(token);
         Integer id=-1;

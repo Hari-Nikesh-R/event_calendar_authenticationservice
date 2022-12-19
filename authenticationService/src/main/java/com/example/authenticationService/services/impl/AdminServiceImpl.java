@@ -99,8 +99,13 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
         {
             if(code!=null) {
                 if (code.equals(generatedCode)) {
-                    save(adminDetails);
-                    return new BaseResponse<>("Code verified and Registered successful", HttpStatus.OK.value(), true, "", "Success");
+                    if(optionalAdminDetails.get().isAuthority()) {
+                        save(adminDetails);
+                        return new BaseResponse<>("Code verified and Registered successful", HttpStatus.OK.value(), true, "", "Success");
+                    }
+                    else {
+                        return new BaseResponse<>("Not Authorized user", HttpStatus.FORBIDDEN.value(), false, "Cannot create account","not authorized");
+                    }
                 }
             }
         }
