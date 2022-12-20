@@ -59,8 +59,9 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
                 hasRights = optionalAdminDetails.get().isAuthority();
                 emailDetails.setRecipient(optionalAdminDetails.get().getEmail());
             }
+            generatedCode.put(optionalAdminDetails.get().getEmail(), generateResetPassCode.generateCode());
         }
-        generatedCode = generateResetPassCode.generateCode();
+
         emailDetails.setCode(generatedCode);
         if (isForgotPassword) {
             emailDetails.setMsgBody("Your code for Reset Password: " + emailDetails.getCode());
