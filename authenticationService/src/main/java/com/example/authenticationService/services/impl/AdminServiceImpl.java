@@ -47,6 +47,7 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
     @Override
     public BaseResponse<String> sendCodeToMail(Integer id,boolean isForgotPassword) {
         String response = "";
+        String email = "";
         EmailDetails emailDetails = new EmailDetails();
         boolean hasRights=false;
         if(id==-2) {
@@ -59,12 +60,12 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
                 hasRights = optionalAdminDetails.get().isAuthority();
                 emailDetails.setRecipient(optionalAdminDetails.get().getEmail());
             }
+            email = optionalAdminDetails.get().getEmail();
             generatedCode.put(optionalAdminDetails.get().getEmail(), generateResetPassCode.generateCode());
         }
-
         emailDetails.setCode(generatedCode);
         if (isForgotPassword) {
-            emailDetails.setMsgBody("Your code for Reset Password: " + emailDetails.getCode());
+            emailDetails.setMsgBody("Your code for Reset Password: " + emailDetails.getCode().get(email));
             emailDetails.setSubject("SECE CAREER QUEST - Reset Password");
         } else {
             emailDetails.setMsgBody("Your code for Registering user: " + emailDetails.getCode());
