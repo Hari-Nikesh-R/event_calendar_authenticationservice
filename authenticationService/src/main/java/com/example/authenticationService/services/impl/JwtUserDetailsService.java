@@ -27,7 +27,16 @@ public class JwtUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        AdminDetails adminDetails = new AdminDetails();
         if (DEFAULT_USER.equals(username)) {
+            adminDetails.setEmail(DEFAULT_USER);
+            adminDetails.setPassword(bCryptPasswordEncoder.encode(DEFAULT_PASSWORD));
+            adminDetails.setAuthority(true);
+            Optional<AdminDetails> optionalAdminDetails = adminDetailsRepository.findByEmail(DEFAULT_USER);
+            if(!optionalAdminDetails.isPresent())
+            {
+                adminDetailsRepository.save(adminDetails);
+            }
             return new User(username, bCryptPasswordEncoder.encode(DEFAULT_PASSWORD),new ArrayList<>());
         }
 

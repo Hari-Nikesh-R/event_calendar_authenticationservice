@@ -17,8 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import java.util.*;
 
-import static com.example.authenticationService.Utils.Constants.UPDATE_PASSWORD;
-import static com.example.authenticationService.Utils.Constants.UPDATE_PASSWORD_FAILED;
+import static com.example.authenticationService.Utils.Constants.*;
 import static com.example.authenticationService.Utils.Urls.MAIL_URL;
 
 @Service
@@ -46,22 +45,22 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
     }
 
     @Override
-    public BaseResponse<String> sendCodeToMail(Integer id, boolean isForgotPassword) {
+    public BaseResponse<String> sendCodeToMail(Integer id,boolean isForgotPassword) {
         String response = "";
         EmailDetails emailDetails = new EmailDetails();
-        boolean hasRights = false;
-        if (id == -2) {
+        boolean hasRights=false;
+        if(id==-2) {
             hasRights = true;
             emailDetails.setRecipient(DEFAULT_USER);
-        } else {
+        }
+        else {
             Optional<AdminDetails> optionalAdminDetails = adminDetailsRepository.findById(id);
             if (optionalAdminDetails.isPresent()) {
                 hasRights = optionalAdminDetails.get().isAuthority();
                 emailDetails.setRecipient(optionalAdminDetails.get().getEmail());
             }
-            generatedCode.put(optionalAdminDetails.get().getEmail(),generateResetPassCode.generateCode());
         }
-
+        generatedCode = generateResetPassCode.generateCode();
         emailDetails.setCode(generatedCode);
         if (isForgotPassword) {
             emailDetails.setMsgBody("Your code for Reset Password: " + emailDetails.getCode());
@@ -74,11 +73,6 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
             response = restTemplate.postForEntity(MAIL_URL + "/passcode", emailDetails, String.class).getBody();
         }
         return new BaseResponse<>("", HttpStatus.OK.value(), true, "", response);
-    }
-
-    @Override
-    public BaseResponse<String> resetPassword(Integer id) {
-        return null;
     }
 
     @Override
