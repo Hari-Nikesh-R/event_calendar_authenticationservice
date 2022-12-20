@@ -15,17 +15,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static com.example.authenticationService.Utils.Constants.*;
 import static com.example.authenticationService.Utils.Urls.MAIL_URL;
 
 @Service
-public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInfoService<AdminDetails,Integer>, AdminService {
+public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInfoService<AdminDetails, Integer>, AdminService {
     @Autowired
     AdminDetailsRepository adminDetailsRepository;
     @Autowired
@@ -33,7 +29,7 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
     @Autowired
     RestTemplate restTemplate;
 
-    private String generatedCode="";
+    private Map<String, String> generatedCode = new HashMap<>();
 
     @Override
     public AdminDetails save(AdminDetails adminDetails) {
@@ -63,8 +59,9 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
                 hasRights = optionalAdminDetails.get().isAuthority();
                 emailDetails.setRecipient(optionalAdminDetails.get().getEmail());
             }
+            generatedCode.put(optionalAdminDetails.get().getEmail(), generateResetPassCode.generateCode());
         }
-        generatedCode = generateResetPassCode.generateCode();
+
         emailDetails.setCode(generatedCode);
         if (isForgotPassword) {
             emailDetails.setMsgBody("Your code for Reset Password: " + emailDetails.getCode());
@@ -81,36 +78,35 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
 
     @Override
     public BaseResponse<String> verifyCode(Integer id, String code) {
-       Optional<AdminDetails> optionalAdminDetails =  adminDetailsRepository.findById(id);
-       if(optionalAdminDetails.isPresent())
-       {
-           if(code!=null) {
-               if (code.equals(generatedCode)) {
-                       return new BaseResponse<>("Code verified", HttpStatus.OK.value(), true, "", "Success");
-                   }
-               }
-           }
-       return new BaseResponse<>("Code not verified",HttpStatus.FORBIDDEN.value(), false,"","Not Verified");
+        Optional<AdminDetails> optionalAdminDetails = adminDetailsRepository.findById(id);
+        if (optionalAdminDetails.isPresent()) {
+            if (code != null) {
+                if (code.equals(generatedCode.get(optionalAdminDetails.get().getEmail()))) {
+                    return new BaseResponse<>("Code verified", HttpStatus.OK.value(), true, "", "Success");
+                }
+            }
+        }
+        return new BaseResponse<>("Code not verified", HttpStatus.FORBIDDEN.value(), false, "", "Not Verified");
     }
+
     @Override
-    public BaseResponse<String> verifyCode(Integer id, String code,AdminDetails adminDetails) {
-        Optional<AdminDetails> optionalAdminDetails =  adminDetailsRepository.findById(id);
-        if(optionalAdminDetails.isPresent())
-        {
-            if(code!=null) {
-                if (code.equals(generatedCode)) {
-                    if(optionalAdminDetails.get().isAuthority()) {
+    public BaseResponse<String> verifyCode(Integer id, String code, AdminDetails adminDetails) {
+        Optional<AdminDetails> optionalAdminDetails = adminDetailsRepository.findById(id);
+        if (optionalAdminDetails.isPresent()) {
+            if (code != null) {
+                if (code.equals(generatedCode.get(optionalAdminDetails.get().getEmail()))) {
+                    if (optionalAdminDetails.get().isAuthority()) {
                         save(adminDetails);
                         return new BaseResponse<>("Code verified and Registered successful", HttpStatus.OK.value(), true, "", "Success");
-                    }
-                    else {
-                        return new BaseResponse<>("Not Authorized user", HttpStatus.FORBIDDEN.value(), false, "Cannot create account","not authorized");
+                    } else {
+                        return new BaseResponse<>("Not Authorized user", HttpStatus.FORBIDDEN.value(), false, "Cannot create account", "not authorized");
                     }
                 }
             }
         }
-        return new BaseResponse<>("Code not verified",HttpStatus.FORBIDDEN.value(), false,"","Not Verified");
+        return new BaseResponse<>("Code not verified", HttpStatus.FORBIDDEN.value(), false, "", "Not Verified");
     }
+
     @Override
     public List<AdminDetails> getAllInfo() {
         return adminDetailsRepository.findAll();
@@ -130,7 +126,7 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
 
     @Override
     public String changePassword(UpdatePassword updatePassword,Boolean isResetPassword) {
-        generatedCode = "";
+        generatedCode.clear();
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         AdminDetails adminDetails = getInfoById(updatePassword.getId());
         if(Objects.nonNull(adminDetails)) {
