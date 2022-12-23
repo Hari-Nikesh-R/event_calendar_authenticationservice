@@ -5,7 +5,8 @@ public interface Constants {
     String USER_NOT_FOUND = "User not found with username: ";
     String ADMIN = "ADMIN";
     String DEFAULT_USER = "hari.nikesh.r.cce@gmail.com";
-    String DEFAULT_PASSWORD = "password";
+    String DEFAULT_PASSWORD = "Admin@123";
+
     String ADMIN_ACCESS = "hasAuthority('ADMIN')";
     String AUTHORIZATION = "Authorization";
     String CLAIMS_ATTR = "claims";
