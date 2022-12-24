@@ -45,33 +45,32 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
     }
 
     @Override
-    public BaseResponse<String> sendCodeToMail(Integer id,boolean isForgotPassword) {
+    public BaseResponse<String> sendCodeToMail(String email) {
         String response = "";
-        String email = "";
         EmailDetails emailDetails = new EmailDetails();
-        boolean hasRights=false;
-        if(id==-2) {
-            hasRights = true;
-            emailDetails.setRecipient(DEFAULT_USER);
+        emailDetails.setRecipient(email);
+        generatedCode.put(email, generateResetPassCode.generateCode());
+        emailDetails.setMsgBody("Your code for Reset Password: " + emailDetails.getCode().get(email));
+        emailDetails.setSubject("SECE CAREER QUEST - Reset Password");
+        response = restTemplate.postForEntity(MAIL_URL + "/passcode", emailDetails, String.class).getBody();
+        return new BaseResponse<>("", HttpStatus.OK.value(), true, "", response);
+    }
+
+    @Override
+    public BaseResponse<String> sendCodeToMail(Integer id) {
+        String response = "";
+        String email="";
+        EmailDetails emailDetails = new EmailDetails();
+        boolean hasRights = false;
+        Optional<AdminDetails> optionalAdminDetails = adminDetailsRepository.findById(id);
+        if (optionalAdminDetails.isPresent()) {
+            hasRights = optionalAdminDetails.get().isAuthority();
+            emailDetails.setRecipient(optionalAdminDetails.get().getEmail());
         }
-        else {
-            Optional<AdminDetails> optionalAdminDetails = adminDetailsRepository.findById(id);
-            if (optionalAdminDetails.isPresent()) {
-                hasRights = optionalAdminDetails.get().isAuthority();
-                emailDetails.setRecipient(optionalAdminDetails.get().getEmail());
-            }
-            email = optionalAdminDetails.get().getEmail();
-            generatedCode.put(optionalAdminDetails.get().getEmail(), generateResetPassCode.generateCode());
-        }
-        emailDetails.setCode(generatedCode);
-        if (isForgotPassword) {
-            emailDetails.setMsgBody("Your code for Reset Password: " + emailDetails.getCode().get(email));
-            emailDetails.setSubject("SECE CAREER QUEST - Reset Password");
-        } else {
-            emailDetails.setMsgBody("Your code for Registering user: " + emailDetails.getCode());
-            emailDetails.setSubject("SECE CAREER QUEST - Register User");
-        }
-        if (isForgotPassword || hasRights) {
+        email = optionalAdminDetails.get().getEmail();
+        generatedCode.put(optionalAdminDetails.get().getEmail(), generateResetPassCode.generateCode());
+        if(hasRights)
+        {
             response = restTemplate.postForEntity(MAIL_URL + "/passcode", emailDetails, String.class).getBody();
         }
         return new BaseResponse<>("", HttpStatus.OK.value(), true, "", response);

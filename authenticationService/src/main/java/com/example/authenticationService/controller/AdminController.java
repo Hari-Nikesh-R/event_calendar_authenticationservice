@@ -84,13 +84,11 @@ public class AdminController {
     }
 
     @PostMapping(value = "/forgot-password/{emailId}")
-    public BaseResponse<String> forgetPassword(@PathVariable("emailId") String email,@RequestHeader(AUTHORIZATION) String token)
+    public BaseResponse<String> forgetPassword(@PathVariable("emailId") String email)
     {
-        HttpEntity<String> entity = setTokenInHeaders(token);
-        Integer id = restTemplate.exchange(AUTHENTICATION_URL + "/admin/fetch-id",HttpMethod.GET,entity,Integer.class).getBody();
-        if(Objects.nonNull(adminDetailsIntegerFetchInfoService.getInfoById(id)))
+        if(!email.isEmpty())
         {
-             return adminService.sendCodeToMail(id,true);
+             return adminService.sendCodeToMail(email);
         }
         return new BaseResponse<>("Invalid email",HttpStatus.NOT_ACCEPTABLE.value(),false,"No Admin Found",null);
     }

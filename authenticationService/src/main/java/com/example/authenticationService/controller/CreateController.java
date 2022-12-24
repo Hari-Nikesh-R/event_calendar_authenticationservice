@@ -76,11 +76,11 @@ public class CreateController {
         catch (Exception exception)
         {
             id=-2;
-            return adminService.sendCodeToMail(id,false);
+            return adminService.sendCodeToMail(id);
         }
         if(Objects.nonNull(adminDetailsIntegerFetchInfoService.getInfoById(id)))
         {
-            return adminService.sendCodeToMail(id,false);
+            return adminService.sendCodeToMail(id);
         }
         return new BaseResponse<>(  "Not authorized User",HttpStatus.NOT_ACCEPTABLE.value(),false,"Admin has no rights to create",null);
     }
