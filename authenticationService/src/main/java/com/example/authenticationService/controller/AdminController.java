@@ -3,6 +3,7 @@ package com.example.authenticationService.controller;
 import com.example.authenticationService.Utils.Constants;
 import com.example.authenticationService.config.JwtTokenUtil;
 import com.example.authenticationService.dtos.BaseResponse;
+import com.example.authenticationService.dtos.EmailDetails;
 import com.example.authenticationService.dtos.UpdatePassword;
 import com.example.authenticationService.model.AdminDetails;
 import com.example.authenticationService.services.AdminService;
@@ -44,6 +45,11 @@ public class AdminController {
         }
         return new BaseResponse<>(HttpStatus.NO_CONTENT.toString(), HttpStatus.NO_CONTENT.value(), false,"No Admin User Found",null);
     }
+    @PostMapping(value = "/validate/email")
+    public Boolean isAdminAvailable(@RequestBody EmailDetails emailDetails)
+    {
+        return adminDetailsIntegerFetchInfoService.validateByEmail(emailDetails.getRecipient());
+    }
 
     @GetMapping(value = FETCH_ID)
     public synchronized Integer getAdminId(@RequestHeader(AUTHORIZATION) String token){
@@ -81,28 +87,6 @@ public class AdminController {
         return new BaseResponse<>("Not Updated",HttpStatus.NON_AUTHORITATIVE_INFORMATION.value(), false,"updateDetails is null",null);
 
 
-    }
-
-    @PostMapping(value = "/forgot-password/{emailId}")
-    public BaseResponse<String> forgetPassword(@PathVariable("emailId") String email)
-    {
-        if(!email.isEmpty())
-        {
-             return adminService.sendCodeToMail(email);
-        }
-        return new BaseResponse<>("Invalid email",HttpStatus.NOT_ACCEPTABLE.value(),false,"No Admin Found",null);
-    }
-
-    @PostMapping(value = "/verify/{code}")
-    public BaseResponse<String> verifyCode(@PathVariable("code") String code,@RequestHeader(AUTHORIZATION) String token)
-    {
-        HttpEntity<String> entity = setTokenInHeaders(token);
-        Integer id = restTemplate.exchange(AUTHENTICATION_URL+"/admin/fetch-id",HttpMethod.GET,entity,Integer.class).getBody();
-        if(id==-1)
-        {
-            return new BaseResponse<>("User Not Found", HttpStatus.NO_CONTENT.value(), false,"Could not find Id",null);
-        }
-        return adminService.verifyCode(id,code);
     }
 
 
