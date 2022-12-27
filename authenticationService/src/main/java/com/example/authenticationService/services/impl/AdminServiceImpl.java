@@ -11,6 +11,9 @@ import com.example.authenticationService.services.FetchInfoService;
 import com.example.authenticationService.services.RegisterService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -105,8 +108,8 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
     }
 
     @Override
-    public String changePassword(UpdatePassword updatePassword,Boolean isResetPassword) {
-        generatedCode.clear();
+    public String changePassword(UpdatePassword updatePassword) {
+        generatedCode.remove(updatePassword.getEmail());
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         AdminDetails adminDetails = getInfoById(updatePassword.getId());
         if(Objects.nonNull(adminDetails)) {
@@ -114,7 +117,25 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
             adminDetailsRepository.save(adminDetails);
             return UPDATE_PASSWORD;
         }
-        return UPDATE_PASSWORD_FAILED;
+        return null;
+    }
+
+    @Override
+    public String forgotPasswordReset(UpdatePassword updatePassword) {
+        BaseResponse<Map<String,String>> baseResponse = restTemplate.exchange(MAIL_URL + "/admin/fetch/forgot-password/code",HttpMethod.GET,null,new ParameterizedTypeReference<BaseResponse<Map<String,String>>>() {}).getBody();
+        Map<String,String> forgotPassCode = baseResponse.getValue();
+        if(updatePassword.getCode().equals(forgotPassCode.get(updatePassword.getEmail()))) {
+            BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+            Optional<AdminDetails> optionalAdminDetails = adminDetailsRepository.findByEmail(updatePassword.getEmail());
+            if(optionalAdminDetails.isPresent())
+            {
+                optionalAdminDetails.get().setPassword(bCryptPasswordEncoder.encode(updatePassword.getPassword()));
+                adminDetailsRepository.save(optionalAdminDetails.get());
+                return UPDATE_PASSWORD;
+            }
+
+        }
+        return null;
     }
 
     @Override
@@ -133,4 +154,5 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
         Optional<AdminDetails> optionalAdminDetails = adminDetailsRepository.findByEmail(email);
         return optionalAdminDetails.isPresent();
     }
+
 }
