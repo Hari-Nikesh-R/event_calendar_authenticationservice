@@ -45,18 +45,6 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
     }
 
     @Override
-    public BaseResponse<String> sendCodeToMail(String email) {
-        String response = "";
-        EmailDetails emailDetails = new EmailDetails();
-        emailDetails.setRecipient(email);
-        generatedCode.put(email, generateResetPassCode.generateCode());
-        emailDetails.setMsgBody("Your code for Reset Password: " + emailDetails.getCode().get(email));
-        emailDetails.setSubject("SECE CAREER QUEST - Reset Password");
-        response = restTemplate.postForEntity(MAIL_URL + "/passcode", emailDetails, String.class).getBody();
-        return new BaseResponse<>("", HttpStatus.OK.value(), true, "", response);
-    }
-
-    @Override
     public BaseResponse<String> sendCodeToMail(Integer id) {
         String response = "";
         String email="";
@@ -74,19 +62,6 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
             response = restTemplate.postForEntity(MAIL_URL + "/passcode", emailDetails, String.class).getBody();
         }
         return new BaseResponse<>("", HttpStatus.OK.value(), true, "", response);
-    }
-
-    @Override
-    public BaseResponse<String> verifyCode(Integer id, String code) {
-        Optional<AdminDetails> optionalAdminDetails = adminDetailsRepository.findById(id);
-        if (optionalAdminDetails.isPresent()) {
-            if (code != null) {
-                if (code.equals(generatedCode.get(optionalAdminDetails.get().getEmail()))) {
-                    return new BaseResponse<>("Code verified", HttpStatus.OK.value(), true, "", "Success");
-                }
-            }
-        }
-        return new BaseResponse<>("Code not verified", HttpStatus.FORBIDDEN.value(), false, "", "Not Verified");
     }
 
     @Override
@@ -121,7 +96,12 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
     @Override
     public AdminDetails getInfoById(Integer id) {
         Optional<AdminDetails>  optionalAdminDetails = adminDetailsRepository.findById(id);
-        return optionalAdminDetails.orElse(null);
+        if(optionalAdminDetails.isPresent())
+        {
+            optionalAdminDetails.get().setPassword("");
+            return optionalAdminDetails.get();
+        }
+        return null;
     }
 
     @Override
@@ -146,5 +126,11 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
             return adminDetailsRepository.save(optionalAdminDetails.get());
         }
         return null;
+    }
+
+    @Override
+    public Boolean validateByEmail(String email) {
+        Optional<AdminDetails> optionalAdminDetails = adminDetailsRepository.findByEmail(email);
+        return optionalAdminDetails.isPresent();
     }
 }

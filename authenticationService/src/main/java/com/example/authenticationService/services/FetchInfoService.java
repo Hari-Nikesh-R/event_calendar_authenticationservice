@@ -10,4 +10,5 @@ public interface FetchInfoService<T,K> {
     T getInfoById(Integer id);
     String changePassword(UpdatePassword updatePassword,Boolean isResetPassword);
     T updateProfile(T details,Integer id);
+    Boolean validateByEmail(String email);
 }
