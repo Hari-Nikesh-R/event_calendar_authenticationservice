@@ -66,7 +66,18 @@ public class AdminController {
         HttpEntity<String> entity = setTokenInHeaders(token);
         Integer id = restTemplate.exchange(AUTHENTICATION_URL + "/admin/fetch-id", HttpMethod.GET,entity,Integer.class).getBody();
         updatePassword.setId(id);
-        String isUpdated = adminDetailsIntegerFetchInfoService.changePassword(updatePassword,false);
+        String isUpdated = adminDetailsIntegerFetchInfoService.changePassword(updatePassword);
+        if(Objects.nonNull(isUpdated))
+        {
+            return new BaseResponse<>("Updated", HttpStatus.OK.value(), true,"",isUpdated);
+        }
+        return new BaseResponse<>(HttpStatus.UPGRADE_REQUIRED.toString(), HttpStatus.UPGRADE_REQUIRED.value(), false,"Failed to update password",null);
+    }
+
+    @PutMapping(value = "/change/password")
+    public BaseResponse<String> updatePassword(@RequestBody UpdatePassword updatePassword){
+
+        String isUpdated = adminDetailsIntegerFetchInfoService.forgotPasswordReset(updatePassword);
         if(Objects.nonNull(isUpdated))
         {
             return new BaseResponse<>("Updated", HttpStatus.OK.value(), true,"",isUpdated);
