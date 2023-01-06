@@ -36,8 +36,10 @@ public class AdminController {
     @Autowired
     JwtTokenUtil jwtTokenUtil;
 
-    @GetMapping(value = "/info/{id}")
-    public BaseResponse<AdminDetails> getAdminDetail(@PathVariable("id") Integer id){
+    @GetMapping(value = "/info")
+    public BaseResponse<AdminDetails> getAdminDetail(@RequestHeader(AUTHORIZATION) String token){
+        HttpEntity<String> entity = setTokenInHeaders(token);
+        Integer id = restTemplate.exchange(AUTHENTICATION_URL + "/admin/fetch-id", HttpMethod.GET,entity,Integer.class).getBody();
         AdminDetails adminDetails = adminDetailsIntegerFetchInfoService.getInfoById(id);
         if(Objects.nonNull(adminDetails))
         {
