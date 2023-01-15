@@ -35,7 +35,7 @@ public class CreateController {
 
     @Autowired
     JwtTokenUtil jwtTokenUtil;
-    @PostMapping(value = ADMIN_URL)
+    @PostMapping(value = USER_URL)
     public BaseResponse<AdminDetails> registerAdmin(@RequestBody AdminDetails adminDetails, @RequestHeader(AUTHORIZATION) String token)
     {
        AdminDetails details=null;
@@ -50,6 +50,32 @@ public class CreateController {
         }
         else{
             return new BaseResponse<>(HttpStatus.ALREADY_REPORTED.getReasonPhrase(), HttpStatus.ALREADY_REPORTED.value(), false, "User Already Exist", null);
+        }
+    }
+    @PostMapping(value = "/verify/{code}")
+    public BaseResponse<String> verifyRegistration(@PathVariable("code") String code,@RequestHeader(AUTHORIZATION) String token, @RequestBody AdminDetails adminDetails)
+    {
+        HttpEntity<String> entity = setTokenInHeaders(token);
+        Integer id = restTemplate.exchange(AUTHENTICATION_URL+"/admin/fetch-id",HttpMethod.GET,entity,Integer.class).getBody();
+        if(id==-1) {
+            return new BaseResponse<>("User Not Found", HttpStatus.NO_CONTENT.value(), false,"Could not find Id",null);
+        }
+        return adminService.verifyCode(id,code,adminDetails);
+    }
+
+    @PostMapping
+    public BaseResponse<String> register(@RequestBody AdminDetails adminDetails)
+    {
+        try {
+            return adminService.sendCodeToMail(adminDetails.getEmail());
+        }
+        catch (Exception exception)
+        {
+            BaseResponse<String> baseResponse = new BaseResponse<>(exception.toString(), HttpStatus.INTERNAL_SERVER_ERROR.value(), false, exception.getMessage(), null);
+            if (baseResponse.getError().contains("401")) {
+                baseResponse.setCode(401);
+            }
+            return baseResponse;
         }
     }
 

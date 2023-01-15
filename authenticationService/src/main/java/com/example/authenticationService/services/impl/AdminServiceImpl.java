@@ -1,5 +1,6 @@
 package com.example.authenticationService.services.impl;
 
+import com.example.authenticationService.Utils.Utility;
 import com.example.authenticationService.dtos.Authority;
 import com.example.authenticationService.dtos.BaseResponse;
 import com.example.authenticationService.services.AdminService;
@@ -37,34 +38,26 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
 
     @Override
     public AdminDetails save(AdminDetails adminDetails) {
-        Optional<AdminDetails> optionalAdminDetails = adminDetailsRepository.findByEmail(adminDetails.getEmail());
-        if(optionalAdminDetails.isPresent())
-        {
-            return null;
+        if(Utility.validatePassword(adminDetails.getPassword()) && Utility.validateEmailId(adminDetails.getEmail())) {
+            Optional<AdminDetails> optionalAdminDetails = adminDetailsRepository.findByEmail(adminDetails.getEmail());
+            if (optionalAdminDetails.isPresent()) {
+                return null;
+            }
+            BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+            String password = bCryptPasswordEncoder.encode(adminDetails.getPassword());
+            adminDetails.setPassword(password);
+            return adminDetailsRepository.save(adminDetails);
         }
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        String password = bCryptPasswordEncoder.encode(adminDetails.getPassword());
-        adminDetails.setPassword(password);
-        return adminDetailsRepository.save(adminDetails);
+        return null;
     }
-
     @Override
-    public BaseResponse<String> sendCodeToMail(Integer id) {
-        String response = "";
-        String email="";
+    public BaseResponse<String> sendCodeToMail(String emailId) {
+        generatedCode.put(emailId,generateResetPassCode.generateCode());
         EmailDetails emailDetails = new EmailDetails();
-        boolean hasRights = false;
-        Optional<AdminDetails> optionalAdminDetails = adminDetailsRepository.findById(id);
-        if (optionalAdminDetails.isPresent()) {
-            hasRights = optionalAdminDetails.get().isAuthority();
-            emailDetails.setRecipient(optionalAdminDetails.get().getEmail());
-        }
-        email = optionalAdminDetails.get().getEmail();
-        generatedCode.put(optionalAdminDetails.get().getEmail(), generateResetPassCode.generateCode());
-        if(hasRights)
-        {
-            response = restTemplate.postForEntity(MAIL_URL + "/passcode", emailDetails, String.class).getBody();
-        }
+        emailDetails.setSubject("Email Confirmation mail");
+        emailDetails.setRecipient(emailId);
+        emailDetails.setMsgBody("Confirmation code for the creating account is : "+generatedCode.get(emailId));
+        String response = restTemplate.postForEntity(MAIL_URL + "/passcode", emailDetails, String.class).getBody();
         return new BaseResponse<>("", HttpStatus.OK.value(), true, "", response);
     }
 
@@ -85,7 +78,6 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
         }
         return new BaseResponse<>("Code not verified", HttpStatus.FORBIDDEN.value(), false, "", "Not Verified");
     }
-
     @Override
     public String updateAuthority(Authority authority) {
         Optional<AdminDetails> optionalAdminDetails =adminDetailsRepository.findByEmail(authority.getEmail());

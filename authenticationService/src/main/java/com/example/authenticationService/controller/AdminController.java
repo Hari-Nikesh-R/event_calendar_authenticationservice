@@ -21,9 +21,8 @@ import static com.example.authenticationService.Utils.Urls.*;
 
 
 @RestController
-@RequestMapping(ADMIN_URL)
+@RequestMapping(USER_URL)
 public class AdminController {
-
     @Autowired
     FetchInfoService<AdminDetails,Integer> adminDetailsIntegerFetchInfoService;
     @Autowired
@@ -101,15 +100,15 @@ public class AdminController {
     @PutMapping(value = "/authority")
     public BaseResponse<String> grantAuthority(@RequestHeader(AUTHORIZATION) String token, @RequestBody Authority authority){
         try {
+            token = token.replace("Bearer ", "");
             String email = jwtTokenUtil.getUsernameFromToken(token);
             if (email.equals(DEFAULT_USER)) {
-                return new BaseResponse<>("Updated Successfully",HttpStatus.OK.value(), true,"",adminService.updateAuthority(authority));
-            }
-            else{
-                return new BaseResponse<>("Not Authorized User",HttpStatus.NON_AUTHORITATIVE_INFORMATION.value(), false,"Update Unsuccessful",null);
+                return new BaseResponse<>("Updated Successfully", HttpStatus.OK.value(), true, "", adminService.updateAuthority(authority));
+            } else {
+                return new BaseResponse<>("Not Authorized User", HttpStatus.NON_AUTHORITATIVE_INFORMATION.value(), false, "Update Unsuccessful", null);
             }
         }
-        catch (Exception exception)
+       catch (Exception exception)
         {
             BaseResponse<String> baseResponse = new BaseResponse<>(exception.toString(), HttpStatus.INTERNAL_SERVER_ERROR.value(), false, exception.getMessage(), null);
             if (baseResponse.getError().contains("401")) {
