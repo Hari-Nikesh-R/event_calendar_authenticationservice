@@ -45,7 +45,6 @@ public class CreateController {
         else{
             return new BaseResponse<>(HttpStatus.NOT_ACCEPTABLE.getReasonPhrase(),HttpStatus.NOT_ACCEPTABLE.value(), false,"Invalid Format",null);
         }
-
         if(Objects.nonNull(details)){
             return new BaseResponse<>(HttpStatus.CREATED.getReasonPhrase(), HttpStatus.OK.value(),true,"",details);
         }
@@ -54,36 +53,7 @@ public class CreateController {
         }
     }
 
-    @PostMapping(value = "/verify/{code}")
-    public BaseResponse<String> verifyRegistration(@PathVariable("code") String code,@RequestHeader(AUTHORIZATION) String token, @RequestBody AdminDetails adminDetails)
-    {
-        HttpEntity<String> entity = setTokenInHeaders(token);
-        Integer id = restTemplate.exchange(AUTHENTICATION_URL+"/admin/fetch-id",HttpMethod.GET,entity,Integer.class).getBody();
-        if(id==-1) {
-            return new BaseResponse<>("User Not Found", HttpStatus.NO_CONTENT.value(), false,"Could not find Id",null);
-        }
-        return adminService.verifyCode(id,code,adminDetails);
-    }
 
-    @PostMapping
-    public BaseResponse<String> register(@RequestHeader(AUTHORIZATION) String token)
-    {
-        HttpEntity<String> entity = setTokenInHeaders(token);
-        Integer id=-1;
-        try {
-            id = restTemplate.exchange(AUTHENTICATION_URL + "/admin/fetch-id", HttpMethod.GET, entity, Integer.class).getBody();
-        }
-        catch (Exception exception)
-        {
-            id=-2;
-            return adminService.sendCodeToMail(id);
-        }
-        if(Objects.nonNull(adminDetailsIntegerFetchInfoService.getInfoById(id)))
-        {
-            return adminService.sendCodeToMail(id);
-        }
-        return new BaseResponse<>(  "Not authorized User",HttpStatus.NOT_ACCEPTABLE.value(),false,"Admin has no rights to create",null);
-    }
     private HttpEntity<String> setTokenInHeaders(String token){
         HttpHeaders httpHeaders = getHeaders();
         httpHeaders.set(AUTHORIZATION,token);

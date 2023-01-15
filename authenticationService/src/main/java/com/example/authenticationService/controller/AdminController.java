@@ -2,16 +2,15 @@ package com.example.authenticationService.controller;
 
 import com.example.authenticationService.Utils.Constants;
 import com.example.authenticationService.config.JwtTokenUtil;
+import com.example.authenticationService.dtos.Authority;
 import com.example.authenticationService.dtos.BaseResponse;
 import com.example.authenticationService.dtos.EmailDetails;
 import com.example.authenticationService.dtos.UpdatePassword;
 import com.example.authenticationService.model.AdminDetails;
 import com.example.authenticationService.services.AdminService;
 import com.example.authenticationService.services.FetchInfoService;
-import com.example.authenticationService.services.RegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -29,7 +28,6 @@ public class AdminController {
     FetchInfoService<AdminDetails,Integer> adminDetailsIntegerFetchInfoService;
     @Autowired
     AdminService adminService;
-
     @Autowired
     RestTemplate restTemplate;
 
@@ -98,10 +96,28 @@ public class AdminController {
             return new BaseResponse<>("Update Successful",HttpStatus.OK.value(),true,"",updatedDetail);
         }
         return new BaseResponse<>("Not Updated",HttpStatus.NON_AUTHORITATIVE_INFORMATION.value(), false,"updateDetails is null",null);
-
-
     }
 
+    @PutMapping(value = "/authority")
+    public BaseResponse<String> grantAuthority(@RequestHeader(AUTHORIZATION) String token, @RequestBody Authority authority){
+        try {
+            String email = jwtTokenUtil.getUsernameFromToken(token);
+            if (email.equals(DEFAULT_USER)) {
+                return new BaseResponse<>("Updated Successfully",HttpStatus.OK.value(), true,"",adminService.updateAuthority(authority));
+            }
+            else{
+                return new BaseResponse<>("Not Authorized User",HttpStatus.NON_AUTHORITATIVE_INFORMATION.value(), false,"Update Unsuccessful",null);
+            }
+        }
+        catch (Exception exception)
+        {
+            BaseResponse<String> baseResponse = new BaseResponse<>(exception.toString(), HttpStatus.INTERNAL_SERVER_ERROR.value(), false, exception.getMessage(), null);
+            if (baseResponse.getError().contains("401")) {
+                baseResponse.setCode(401);
+            }
+            return baseResponse;
+        }
+    }
 
     private HttpEntity<String> setTokenInHeaders(String token){
         HttpHeaders httpHeaders = getHeaders();

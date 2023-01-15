@@ -18,7 +18,7 @@ public class Utility implements GenerateResetPassCode{
     public static boolean validateEmailId(String mailId){
     Pattern pattern=Pattern.compile(EMAIL_VALIDATION);
     Matcher matcher=pattern.matcher(mailId);
-    return  matcher.matches();
+    return  matcher.matches() && mailId.contains("@sece.ac.in");
 }
     @Override
     public String generateCode() {

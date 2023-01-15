@@ -1,5 +1,6 @@
 package com.example.authenticationService.services.impl;
 
+import com.example.authenticationService.dtos.Authority;
 import com.example.authenticationService.dtos.BaseResponse;
 import com.example.authenticationService.services.AdminService;
 import com.example.authenticationService.services.GenerateResetPassCode;
@@ -83,6 +84,17 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
             }
         }
         return new BaseResponse<>("Code not verified", HttpStatus.FORBIDDEN.value(), false, "", "Not Verified");
+    }
+
+    @Override
+    public String updateAuthority(Authority authority) {
+        Optional<AdminDetails> optionalAdminDetails =adminDetailsRepository.findByEmail(authority.getEmail());
+        if(optionalAdminDetails.isPresent())
+        {
+            optionalAdminDetails.get().setAuthority(authority.isAuthorized());
+            adminDetailsRepository.save(optionalAdminDetails.get());
+        }
+        return "Changed Authority";
     }
 
     @Override
