@@ -35,9 +35,9 @@ public class AdminController {
 
     @GetMapping(value = "/info")
     public BaseResponse<AdminDetails> getAdminDetail(@RequestHeader(AUTHORIZATION) String token){
-        HttpEntity<String> entity = setTokenInHeaders(token);
-        Integer id = restTemplate.exchange(AUTHENTICATION_URL + "/admin/fetch-id", HttpMethod.GET,entity,Integer.class).getBody();
-        AdminDetails adminDetails = adminDetailsIntegerFetchInfoService.getInfoById(id);
+        token = token.replace("Bearer ","");
+       String email = jwtTokenUtil.getUsernameFromToken(token);
+       AdminDetails adminDetails = adminDetailsIntegerFetchInfoService.getInfoByEmail(email);
         if(Objects.nonNull(adminDetails))
         {
             return new BaseResponse<>(HttpStatus.ACCEPTED.toString(), HttpStatus.OK.value(), true,"",adminDetails);
@@ -63,7 +63,7 @@ public class AdminController {
     @PutMapping(value = "/update/password")
         public BaseResponse<String> updatePassword(@RequestBody UpdatePassword updatePassword, @RequestHeader(AUTHORIZATION) String token){
         HttpEntity<String> entity = setTokenInHeaders(token);
-        Integer id = restTemplate.exchange(AUTHENTICATION_URL + "/admin/fetch-id", HttpMethod.GET,entity,Integer.class).getBody();
+        Integer id = restTemplate.exchange(AUTHENTICATION_URL + "/user/fetch-id", HttpMethod.GET,entity,Integer.class).getBody();
         updatePassword.setId(id);
         String isUpdated = adminDetailsIntegerFetchInfoService.changePassword(updatePassword);
         if(Objects.nonNull(isUpdated))
@@ -87,9 +87,9 @@ public class AdminController {
     @PutMapping(value = "/update/profile")
     public BaseResponse<AdminDetails> updateAdminDetails(@RequestBody AdminDetails adminDetails, @RequestHeader(AUTHORIZATION) String token)
     {
-        HttpEntity<String> entity = setTokenInHeaders(token);
-        Integer id = restTemplate.exchange(AUTHENTICATION_URL + "/admin/fetch-id",HttpMethod.GET,entity,Integer.class).getBody();
-        AdminDetails updatedDetail = adminDetailsIntegerFetchInfoService.updateProfile(adminDetails,id);
+        token = token.replace("Bearer ","");
+        String email = jwtTokenUtil.getUsernameFromToken(token);
+        AdminDetails updatedDetail = adminDetailsIntegerFetchInfoService.updateProfile(adminDetails,email);
         if(Objects.nonNull(updatedDetail))
         {
             return new BaseResponse<>("Update Successful",HttpStatus.OK.value(),true,"",updatedDetail);
@@ -111,6 +111,30 @@ public class AdminController {
        catch (Exception exception)
         {
             BaseResponse<String> baseResponse = new BaseResponse<>(exception.toString(), HttpStatus.INTERNAL_SERVER_ERROR.value(), false, exception.getMessage(), null);
+            if (baseResponse.getError().contains("401")) {
+                baseResponse.setCode(401);
+            }
+            return baseResponse;
+        }
+    }
+
+    //todo: Need to refurnish
+    @GetMapping(value = "/is-authorized")
+    public BaseResponse<Boolean> isAuthorizeUser(@RequestHeader(AUTHORIZATION) String token){
+        try {
+            token = token.replace("Bearer ", "");
+            String email = jwtTokenUtil.getUsernameFromToken(token);
+            Boolean isAuthorized = adminService.isAuthorizedUser(email);
+            if(isAuthorized){
+                return new BaseResponse<>("Authorized User",HttpStatus.OK.value(),true, "", true);
+            }
+            else{
+                return new BaseResponse<>("Not Authorized User", HttpStatus.NO_CONTENT.value(), false, "Not authorized to create", false);
+            }
+        }
+        catch (Exception exception)
+        {
+            BaseResponse<Boolean> baseResponse = new BaseResponse<>(exception.toString(), HttpStatus.INTERNAL_SERVER_ERROR.value(), false, exception.getMessage(), null);
             if (baseResponse.getError().contains("401")) {
                 baseResponse.setCode(401);
             }

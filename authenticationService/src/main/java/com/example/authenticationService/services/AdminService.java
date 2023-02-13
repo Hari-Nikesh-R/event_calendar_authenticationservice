@@ -6,7 +6,8 @@ import com.example.authenticationService.model.AdminDetails;
 
 public interface AdminService {
     BaseResponse<String> sendCodeToMail(String email);
-    BaseResponse<String> verifyCode(Integer id, String code, AdminDetails adminDetails);
+    BaseResponse<String> verifyCode(String code, AdminDetails adminDetails);
     String updateAuthority(Authority authority);
+    Boolean isAuthorizedUser(String email);
 
 }

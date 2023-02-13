@@ -38,7 +38,6 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
 
     @Override
     public AdminDetails save(AdminDetails adminDetails) {
-        if(Utility.validatePassword(adminDetails.getPassword()) && Utility.validateEmailId(adminDetails.getEmail())) {
             Optional<AdminDetails> optionalAdminDetails = adminDetailsRepository.findByEmail(adminDetails.getEmail());
             if (optionalAdminDetails.isPresent()) {
                 return null;
@@ -47,8 +46,6 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
             String password = bCryptPasswordEncoder.encode(adminDetails.getPassword());
             adminDetails.setPassword(password);
             return adminDetailsRepository.save(adminDetails);
-        }
-        return null;
     }
     @Override
     public BaseResponse<String> sendCodeToMail(String emailId) {
@@ -62,20 +59,15 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
     }
 
     @Override
-    public BaseResponse<String> verifyCode(Integer id, String code, AdminDetails adminDetails) {
-        Optional<AdminDetails> optionalAdminDetails = adminDetailsRepository.findById(id);
-        if (optionalAdminDetails.isPresent()) {
+    public BaseResponse<String> verifyCode(String code, AdminDetails adminDetails) {
             if (code != null) {
-                if (code.equals(generatedCode.get(optionalAdminDetails.get().getEmail()))) {
-                    if (optionalAdminDetails.get().isAuthority()) {
+                if (code.equals(generatedCode.get(adminDetails.getEmail()))) {
                         save(adminDetails);
                         return new BaseResponse<>("Code verified and Registered successful", HttpStatus.OK.value(), true, "", "Success");
                     } else {
-                        return new BaseResponse<>("Not Authorized user", HttpStatus.FORBIDDEN.value(), false, "Cannot create account", "not authorized");
+                        return new BaseResponse<>("Wrong Code", HttpStatus.FORBIDDEN.value(), false, "Cannot create account", "Invalid Code");
                     }
                 }
-            }
-        }
         return new BaseResponse<>("Code not verified", HttpStatus.FORBIDDEN.value(), false, "", "Not Verified");
     }
     @Override
@@ -87,6 +79,11 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
             adminDetailsRepository.save(optionalAdminDetails.get());
         }
         return "Changed Authority";
+    }
+
+    @Override
+    public Boolean isAuthorizedUser(String email) {
+        return null;
     }
 
     @Override
@@ -109,6 +106,12 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
             return optionalAdminDetails.get();
         }
         return null;
+    }
+
+    @Override
+    public AdminDetails getInfoByEmail(String email) {
+        Optional<AdminDetails> optionalAdminDetails = adminDetailsRepository.findByEmail(email);
+        return optionalAdminDetails.orElse(null);
     }
 
     @Override
@@ -143,10 +146,12 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
     }
 
     @Override
-    public AdminDetails updateProfile(AdminDetails details, Integer id) {
-        Optional<AdminDetails> optionalAdminDetails = adminDetailsRepository.findById(id);
+    public AdminDetails updateProfile(AdminDetails details, String email) {
+        Optional<AdminDetails> optionalAdminDetails = adminDetailsRepository.findByEmail(email);
         if(optionalAdminDetails.isPresent()) {
             details.setId(optionalAdminDetails.get().getId());
+            details.setEmail(optionalAdminDetails.get().getEmail());
+            details.setPassword(optionalAdminDetails.get().getPassword());
             BeanUtils.copyProperties(details, optionalAdminDetails.get());
             return adminDetailsRepository.save(optionalAdminDetails.get());
         }

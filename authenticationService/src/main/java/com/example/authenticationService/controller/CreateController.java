@@ -52,22 +52,26 @@ public class CreateController {
             return new BaseResponse<>(HttpStatus.ALREADY_REPORTED.getReasonPhrase(), HttpStatus.ALREADY_REPORTED.value(), false, "User Already Exist", null);
         }
     }
-    @PostMapping(value = "/verify/{code}")
-    public BaseResponse<String> verifyRegistration(@PathVariable("code") String code,@RequestHeader(AUTHORIZATION) String token, @RequestBody AdminDetails adminDetails)
+    @PostMapping(value = "/verify")
+    public BaseResponse<String> verifyRegistration(@RequestParam("code") String code, @RequestBody AdminDetails adminDetails)
     {
-        HttpEntity<String> entity = setTokenInHeaders(token);
-        Integer id = restTemplate.exchange(AUTHENTICATION_URL+"/admin/fetch-id",HttpMethod.GET,entity,Integer.class).getBody();
-        if(id==-1) {
-            return new BaseResponse<>("User Not Found", HttpStatus.NO_CONTENT.value(), false,"Could not find Id",null);
-        }
-        return adminService.verifyCode(id,code,adminDetails);
+//        HttpEntity<String> entity = setTokenInHeaders(token);
+//        Integer id = restTemplate.exchange(AUTHENTICATION_URL+"/admin/fetch-id",HttpMethod.GET,entity,Integer.class).getBody();
+//        if(id==-1) {
+//            return new BaseResponse<>("User Not Found", HttpStatus.NO_CONTENT.value(), false,"Could not find Id",null);
+//        }
+        return adminService.verifyCode(code,adminDetails);
     }
-
     @PostMapping
     public BaseResponse<String> register(@RequestBody AdminDetails adminDetails)
     {
         try {
-            return adminService.sendCodeToMail(adminDetails.getEmail());
+            if(Utility.validatePassword(adminDetails.getPassword()) && Utility.validateEmailId(adminDetails.getEmail())) {
+                return adminService.sendCodeToMail(adminDetails.getEmail());
+            }
+            else{
+                return new BaseResponse<>("Only SECE Organization member is allowed", HttpStatus.NO_CONTENT.value(), false,"Cannot create",null);
+            }
         }
         catch (Exception exception)
         {
@@ -78,8 +82,6 @@ public class CreateController {
             return baseResponse;
         }
     }
-
-
     private HttpEntity<String> setTokenInHeaders(String token){
         HttpHeaders httpHeaders = getHeaders();
         httpHeaders.set(AUTHORIZATION,token);
