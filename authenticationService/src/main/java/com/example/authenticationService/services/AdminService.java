@@ -4,10 +4,14 @@ import com.example.authenticationService.dtos.Authority;
 import com.example.authenticationService.dtos.BaseResponse;
 import com.example.authenticationService.model.AdminDetails;
 
+import java.util.List;
+
 public interface AdminService {
     BaseResponse<String> sendCodeToMail(String email);
     BaseResponse<String> verifyCode(String code, AdminDetails adminDetails);
     String updateAuthority(Authority authority);
     Boolean isAuthorizedUser(String email);
+    List<Authority> getAuthority();
+
 
 }

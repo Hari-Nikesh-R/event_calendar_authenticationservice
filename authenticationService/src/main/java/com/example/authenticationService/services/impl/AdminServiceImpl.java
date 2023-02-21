@@ -87,6 +87,17 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
     }
 
     @Override
+    public List<Authority> getAuthority() {
+        List<AdminDetails> adminDetailsList = adminDetailsRepository.findAll();
+        List<Authority> authorityList = new ArrayList<>();
+        for(AdminDetails adminDetails : adminDetailsList)
+        {
+            authorityList.add(new Authority(adminDetails.getEmail(), adminDetails.isAuthority()));
+        }
+        return authorityList;
+    }
+
+    @Override
     public List<AdminDetails> getAllInfo() {
         return adminDetailsRepository.findAll();
     }
@@ -129,18 +140,13 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
 
     @Override
     public String forgotPasswordReset(UpdatePassword updatePassword) {
-        BaseResponse<Map<String,String>> baseResponse = restTemplate.exchange(MAIL_URL + "/admin/fetch/forgot-password/code",HttpMethod.GET,null,new ParameterizedTypeReference<BaseResponse<Map<String,String>>>() {}).getBody();
-        Map<String,String> forgotPassCode = baseResponse.getValue();
-        if(updatePassword.getCode().equals(forgotPassCode.get(updatePassword.getEmail()))) {
+        Optional<AdminDetails> optionalAdminDetails = adminDetailsRepository.findByEmail(updatePassword.getEmail());
+        if(optionalAdminDetails.isPresent())
+        {
             BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-            Optional<AdminDetails> optionalAdminDetails = adminDetailsRepository.findByEmail(updatePassword.getEmail());
-            if(optionalAdminDetails.isPresent())
-            {
-                optionalAdminDetails.get().setPassword(bCryptPasswordEncoder.encode(updatePassword.getPassword()));
-                adminDetailsRepository.save(optionalAdminDetails.get());
-                return UPDATE_PASSWORD;
-            }
-
+            optionalAdminDetails.get().setPassword(bCryptPasswordEncoder.encode(updatePassword.getPassword()));
+            adminDetailsRepository.save(optionalAdminDetails.get());
+            return UPDATE_PASSWORD;
         }
         return null;
     }

@@ -14,6 +14,7 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Objects;
 
 import static com.example.authenticationService.Utils.Constants.*;
@@ -45,9 +46,9 @@ public class AdminController {
         return new BaseResponse<>(HttpStatus.NO_CONTENT.toString(), HttpStatus.NO_CONTENT.value(), false,"No Admin User Found",null);
     }
     @PostMapping(value = "/validate/email")
-    public Boolean isAdminAvailable(@RequestBody EmailDetails emailDetails)
+    public Boolean isAdminAvailable(@RequestBody AdminDetails adminDetails)
     {
-        return adminDetailsIntegerFetchInfoService.validateByEmail(emailDetails.getRecipient());
+        return adminDetailsIntegerFetchInfoService.validateByEmail(adminDetails.getEmail());
     }
 
     @GetMapping(value = FETCH_ID)
@@ -135,6 +136,27 @@ public class AdminController {
         catch (Exception exception)
         {
             BaseResponse<Boolean> baseResponse = new BaseResponse<>(exception.toString(), HttpStatus.INTERNAL_SERVER_ERROR.value(), false, exception.getMessage(), null);
+            if (baseResponse.getError().contains("401")) {
+                baseResponse.setCode(401);
+            }
+            return baseResponse;
+        }
+    }
+
+    @GetMapping(value = "/getAllUser")
+    public BaseResponse<List<Authority>> getAuthorizedUser(){
+        try{
+            List<Authority> authorities = adminService.getAuthority();
+            if(Objects.nonNull(authorities)) {
+                return new BaseResponse<>("All Users", HttpStatus.OK.value(), true, "", authorities);
+            }
+            else{
+                return new BaseResponse<>("No Authorized Users", HttpStatus.NO_CONTENT.value(), false, "No Users found",null);
+            }
+        }
+        catch (Exception exception)
+        {
+            BaseResponse<List<Authority>> baseResponse = new BaseResponse<>(exception.toString(), HttpStatus.INTERNAL_SERVER_ERROR.value(), false, exception.getMessage(), null);
             if (baseResponse.getError().contains("401")) {
                 baseResponse.setCode(401);
             }
