@@ -144,6 +144,12 @@ public class AdminController {
         }
     }
 
+    @GetMapping(value = "/get-email")
+    public String getEmailByToken(@RequestHeader(AUTHORIZATION) String token){
+        token = token.replace("Bearer ", "");
+        return jwtTokenUtil.getUsernameFromToken(token);
+    }
+
     @GetMapping(value = GET_ALL_USER)
     public BaseResponse<List<Authority>> getAuthorizedUser(){
         try{
