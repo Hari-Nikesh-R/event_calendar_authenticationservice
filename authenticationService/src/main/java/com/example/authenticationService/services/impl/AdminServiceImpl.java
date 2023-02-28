@@ -1,5 +1,6 @@
 package com.example.authenticationService.services.impl;
 
+import com.example.authenticationService.Utils.Constants;
 import com.example.authenticationService.Utils.Utility;
 import com.example.authenticationService.dtos.Authority;
 import com.example.authenticationService.dtos.BaseResponse;
@@ -23,7 +24,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.*;
 
 import static com.example.authenticationService.Utils.Constants.*;
-import static com.example.authenticationService.Utils.Urls.MAIL_URL;
+import static com.example.authenticationService.Utils.Urls.*;
+import static com.example.authenticationService.Utils.Urls.UPDATE_PASSWORD;
 
 @Service
 public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInfoService<AdminDetails, Integer>, AdminService {
@@ -54,7 +56,7 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
         emailDetails.setSubject("Email Confirmation mail");
         emailDetails.setRecipient(emailId);
         emailDetails.setMsgBody("Confirmation code for the creating account is : "+generatedCode.get(emailId));
-        String response = restTemplate.postForEntity(MAIL_URL + "/passcode", emailDetails, String.class).getBody();
+        String response = restTemplate.postForEntity(MAIL_URL + PASSCODE, emailDetails, String.class).getBody();
         return new BaseResponse<>("", HttpStatus.OK.value(), true, "", response);
     }
 
@@ -78,7 +80,7 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
             optionalAdminDetails.get().setAuthority(authority.isAuthorized());
             adminDetailsRepository.save(optionalAdminDetails.get());
         }
-        return "Changed Authority";
+        return CHANGE_AUTHORITY;
     }
 
     @Override
@@ -133,7 +135,7 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
         if(Objects.nonNull(adminDetails)) {
             adminDetails.setPassword(bCryptPasswordEncoder.encode(updatePassword.getPassword()));
             adminDetailsRepository.save(adminDetails);
-            return UPDATE_PASSWORD;
+            return Constants.UPDATE_PASSWORD;
         }
         return null;
     }
@@ -146,7 +148,7 @@ public class AdminServiceImpl implements RegisterService<AdminDetails>, FetchInf
             BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
             optionalAdminDetails.get().setPassword(bCryptPasswordEncoder.encode(updatePassword.getPassword()));
             adminDetailsRepository.save(optionalAdminDetails.get());
-            return UPDATE_PASSWORD;
+            return Constants.UPDATE_PASSWORD;
         }
         return null;
     }

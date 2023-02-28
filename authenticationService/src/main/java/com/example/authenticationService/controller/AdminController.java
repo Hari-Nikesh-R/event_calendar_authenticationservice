@@ -1,6 +1,7 @@
 package com.example.authenticationService.controller;
 
 import com.example.authenticationService.Utils.Constants;
+import com.example.authenticationService.Utils.Urls;
 import com.example.authenticationService.config.JwtTokenUtil;
 import com.example.authenticationService.dtos.Authority;
 import com.example.authenticationService.dtos.BaseResponse;
@@ -34,7 +35,7 @@ public class AdminController {
     @Autowired
     JwtTokenUtil jwtTokenUtil;
 
-    @GetMapping(value = "/info")
+    @GetMapping(value = INFO)
     public BaseResponse<AdminDetails> getAdminDetail(@RequestHeader(AUTHORIZATION) String token){
         token = token.replace("Bearer ","");
        String email = jwtTokenUtil.getUsernameFromToken(token);
@@ -45,7 +46,7 @@ public class AdminController {
         }
         return new BaseResponse<>(HttpStatus.NO_CONTENT.toString(), HttpStatus.NO_CONTENT.value(), false,"No Admin User Found",null);
     }
-    @PostMapping(value = "/validate/email")
+    @PostMapping(value = VALIDATE_EMAIL)
     public Boolean isAdminAvailable(@RequestBody AdminDetails adminDetails)
     {
         return adminDetailsIntegerFetchInfoService.validateByEmail(adminDetails.getEmail());
@@ -61,7 +62,7 @@ public class AdminController {
         }
         return -1;
     }
-    @PutMapping(value = "/update/password")
+    @PutMapping(value = Urls.UPDATE_PASSWORD)
         public BaseResponse<String> updatePassword(@RequestBody UpdatePassword updatePassword, @RequestHeader(AUTHORIZATION) String token){
         HttpEntity<String> entity = setTokenInHeaders(token);
         Integer id = restTemplate.exchange(AUTHENTICATION_URL + "/user/fetch-id", HttpMethod.GET,entity,Integer.class).getBody();
@@ -74,7 +75,7 @@ public class AdminController {
         return new BaseResponse<>(HttpStatus.UPGRADE_REQUIRED.toString(), HttpStatus.UPGRADE_REQUIRED.value(), false,"Failed to update password",null);
     }
 
-    @PutMapping(value = "/change/password")
+    @PutMapping(value = CHANGE_PASSWORD)
     public BaseResponse<String> updatePassword(@RequestBody UpdatePassword updatePassword){
 
         String isUpdated = adminDetailsIntegerFetchInfoService.forgotPasswordReset(updatePassword);
@@ -85,7 +86,7 @@ public class AdminController {
         return new BaseResponse<>(HttpStatus.UPGRADE_REQUIRED.toString(), HttpStatus.UPGRADE_REQUIRED.value(), false,"Failed to update password",null);
     }
 
-    @PutMapping(value = "/update/profile")
+    @PutMapping(value = UPDATE_PROFILE)
     public BaseResponse<AdminDetails> updateAdminDetails(@RequestBody AdminDetails adminDetails, @RequestHeader(AUTHORIZATION) String token)
     {
         token = token.replace("Bearer ","");
@@ -120,7 +121,7 @@ public class AdminController {
     }
 
     //todo: Need to refurnish
-    @GetMapping(value = "/is-authorized")
+    @GetMapping(value = IS_AUTHORIZED)
     public BaseResponse<Boolean> isAuthorizeUser(@RequestHeader(AUTHORIZATION) String token){
         try {
             token = token.replace("Bearer ", "");
@@ -143,7 +144,7 @@ public class AdminController {
         }
     }
 
-    @GetMapping(value = "/getAllUser")
+    @GetMapping(value = GET_ALL_USER)
     public BaseResponse<List<Authority>> getAuthorizedUser(){
         try{
             List<Authority> authorities = adminService.getAuthority();
